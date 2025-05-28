@@ -1,4 +1,5 @@
-import 'package:eneam/screens/scanqrcode_screen.dart';
+import 'package:eneam/screens/atd_success_screen.dart';
+import 'package:eneam/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart'; // Import de l'écran d'accueil
 
@@ -98,7 +99,39 @@ class AppLauncher extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ScanQRCodeScreen(),
+                      builder: (context) => const HomeScreen(isSenator: false),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 30),
+              // Bouton pour profile
+              _buildLaunchButton(
+                context,
+                title: 'Profil',
+                subtitle: 'Accès standard',
+                icon: Icons.person,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 30),
+              // Bouton pour profile
+              _buildLaunchButton(
+                context,
+                title: 'Page de Succès',
+                subtitle: 'Accès standard',
+                icon: Icons.person,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AttendanceSuccessScreen(),
                     ),
                   );
                 },
@@ -118,6 +151,7 @@ class AppLauncher extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => const HomeScreen(isSenator: true),
                     ),
+
                   );
                 },
               ),
