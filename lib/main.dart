@@ -1,5 +1,6 @@
 import 'package:eneam/screens/atd_success_screen.dart';
 import 'package:eneam/screens/profile_screen.dart';
+import 'package:eneam/screens/scanqrcode_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart'; // Import de l'écran d'accueil
 
@@ -52,40 +53,6 @@ class AppLauncher extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 30),
-
-              // Titre
-              const Text(
-                'App Présence',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              // Sous-titre
-              const Text(
-                'Gérez vos présences facilement',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 50),
-
-              const Text(
-                'Choisir le type d\'utilisateur :',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
 
               const SizedBox(height: 30),
 
@@ -100,6 +67,23 @@ class AppLauncher extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const HomeScreen(isSenator: false),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 30),
+
+              // Bouton pour l'utilisateur normal
+              _buildLaunchButton(
+                context,
+                title: 'Scan QR code',
+                subtitle: 'Accès standard',
+                icon: Icons.person,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ScanQRCodeScreen(),
                     ),
                   );
                 },
