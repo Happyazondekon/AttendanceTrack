@@ -59,6 +59,7 @@ class ScanQRCodeScreen extends StatelessWidget {
                         child: const Text(
                           'Scanner QR Code',
                           style: TextStyle(
+                            fontFamily: 'Cabin',
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF1A365D),
@@ -202,6 +203,7 @@ class ScanQRCodeScreen extends StatelessWidget {
                 child: Text(
                   title,
                   style: const TextStyle(
+                    fontFamily: 'Cabin',
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,

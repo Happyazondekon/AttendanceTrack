@@ -52,6 +52,7 @@ class ProfileScreen extends StatelessWidget {
                     const Text(
                       'Profil',
                       style: TextStyle(
+                        fontFamily: 'Cabin',
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF2D3748),
@@ -126,6 +127,7 @@ class ProfileScreen extends StatelessWidget {
                         child: Text(
                           'jordydy@gmail.com',
                           style: TextStyle(
+                            fontFamily: 'Cabin',
                             color: Colors.white.withOpacity(0.8),
                             fontSize: 16,
                           ),
@@ -137,6 +139,7 @@ class ProfileScreen extends StatelessWidget {
                         child: Text(
                           'Identifiants',
                           style: TextStyle(
+                            fontFamily: 'Cabin',
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -173,6 +176,7 @@ class ProfileScreen extends StatelessWidget {
                         child: Text(
                           'Raccourcis',
                           style: TextStyle(
+                            fontFamily: 'Cabin',
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -248,6 +252,7 @@ class ProfileScreen extends StatelessWidget {
             Text(
               title,
               style: const TextStyle(
+                fontFamily: 'Cabin',
                 color: Colors.white,
                 fontSize: 16,
               ),

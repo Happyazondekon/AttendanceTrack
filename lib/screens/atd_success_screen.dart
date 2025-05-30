@@ -59,6 +59,7 @@ class AttendanceSuccessScreen extends StatelessWidget {
                         child: const Text(
                           'Valider Présence',
                           style: TextStyle(
+                            fontFamily: 'Cabin',
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF1A365D),
@@ -95,6 +96,7 @@ class AttendanceSuccessScreen extends StatelessWidget {
                       const Text(
                         'Présence Validée avec succès.',
                         style: TextStyle(
+                          fontFamily: 'Cabin',
                           fontSize: 26,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -198,6 +200,7 @@ class AttendanceSuccessScreen extends StatelessWidget {
                 child: Text(
                   title,
                   style: const TextStyle(
+                    fontFamily: 'Cabin',
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,

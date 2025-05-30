@@ -34,6 +34,7 @@ class HomeScreen extends StatelessWidget {
               const Text(
                 'Bonjour Jordy',
                 style: TextStyle(
+                  fontFamily: 'Cabin',
                   fontSize: 32,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF2D3748),
@@ -188,6 +189,7 @@ class HomeScreen extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
+                    fontFamily: 'Cabin',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: isEnabled ? Colors.white : Colors.white.withOpacity(0.7),
