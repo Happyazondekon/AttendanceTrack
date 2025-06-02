@@ -1,6 +1,10 @@
+import 'package:eneam/screens/atd_fail_screen.dart';
+import 'package:eneam/screens/atd_history_screen.dart';
+import 'package:eneam/screens/atd_submit_screen.dart';
 import 'package:eneam/screens/atd_success_screen.dart';
 import 'package:eneam/screens/profile_screen.dart';
 import 'package:eneam/screens/scanqrcode_screen.dart';
+import 'package:eneam/screens/timetable_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart'; // Import de l'écran d'accueil
 
@@ -53,7 +57,6 @@ class AppLauncher extends StatelessWidget {
                 ),
               ),
 
-
               const SizedBox(height: 30),
 
               // Bouton pour l'utilisateur normal
@@ -73,50 +76,16 @@ class AppLauncher extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // Bouton pour l'utilisateur normal
-              _buildLaunchButton(
-                context,
-                title: 'Scan QR code',
-                subtitle: 'Accès standard',
-                icon: Icons.person,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ScanQRCodeScreen(),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 30),
               // Bouton pour profile
               _buildLaunchButton(
                 context,
-                title: 'Profil',
+                title: 'Page erreur',
                 subtitle: 'Accès standard',
-                icon: Icons.person,
+                icon: Icons.error,
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 30),
-              // Bouton pour profile
-              _buildLaunchButton(
-                context,
-                title: 'Page de Succès',
-                subtitle: 'Accès standard',
-                icon: Icons.person,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AttendanceSuccessScreen(),
-                    ),
+                    MaterialPageRoute(builder: (context) => GPSErrorScreen()),
                   );
                 },
               ),
@@ -135,7 +104,6 @@ class AppLauncher extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => const HomeScreen(isSenator: true),
                     ),
-
                   );
                 },
               ),
@@ -147,12 +115,12 @@ class AppLauncher extends StatelessWidget {
   }
 
   Widget _buildLaunchButton(
-      BuildContext context, {
-        required String title,
-        required String subtitle,
-        required IconData icon,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -178,13 +146,10 @@ class AppLauncher extends StatelessWidget {
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

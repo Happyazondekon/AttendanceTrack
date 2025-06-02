@@ -1,4 +1,9 @@
+import 'package:eneam/screens/atd_history_screen.dart';
+import 'package:eneam/screens/atd_submit_screen.dart';
+import 'package:eneam/screens/atd_success_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'atd_fail_screen.dart';
 
 class ScanQRCodeScreen extends StatelessWidget {
   const ScanQRCodeScreen({super.key});
@@ -108,8 +113,11 @@ class ScanQRCodeScreen extends StatelessWidget {
                         title: 'Scanner un QR Code',
                         isPrimary: true,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Lancement du scanner QR')),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>  AttendanceSuccessScreen(),
+                            ),
                           );
                         },
                       ),
@@ -123,8 +131,11 @@ class ScanQRCodeScreen extends StatelessWidget {
                         title: 'Historiques de Présences',
                         isPrimary: false,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Navigation vers Historiques')),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>  AttendanceHistoryScreen(),
+                            ),
                           );
                         },
                       ),

@@ -1,3 +1,7 @@
+import 'package:eneam/screens/atd_history_screen.dart';
+import 'package:eneam/screens/profile_screen.dart';
+import 'package:eneam/screens/scanqrcode_screen.dart';
+import 'package:eneam/screens/timetable_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -27,40 +31,48 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 50),
-            // Header avec profil
-            Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Bonjour Jordy',
-                style: TextStyle(
-                  fontFamily: 'Cabin',
-                  fontSize: 32,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D3748),
-                ),
-              ),
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(
-                    color: const Color(0xFF4C51BF),
-                    width: 2,
+              // Header avec profil
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Bonjour Jordy',
+                    style: TextStyle(
+                      fontFamily: 'Cabin',
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3748),
+                    ),
                   ),
-                ),
-                child: const Icon(
-                  Icons.person,
-                  color: Color(0xFF4C51BF),
-                  size: 24,
-                ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfileScreen()),
+                      );
+                    },
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                          color: Color(0xFF4C51BF),
+                          width: 2,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        color: Color(0xFF4C51BF),
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
 
-          const SizedBox(height: 40),
+              const SizedBox(height: 40),
 
 
           // Image centrale depuis assets
@@ -84,8 +96,11 @@ class HomeScreen extends StatelessWidget {
                 title: 'Historiques de Présences',
                 onTap: () {
                   // Navigation vers l'historique
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Navigation vers Historiques de Présences')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>  AttendanceHistoryScreen(),
+                    ),
                   );
                 },
               ),
@@ -99,8 +114,11 @@ class HomeScreen extends StatelessWidget {
                 title: 'Mon Emploi du Temps',
                 onTap: () {
                   // Navigation vers l'emploi du temps
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Navigation vers Mon Emploi du Temps')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>  EmploiDuTempsScreen(),
+                    ),
                   );
                 },
               ),
@@ -114,8 +132,11 @@ class HomeScreen extends StatelessWidget {
                 title: 'Scanner pour valider',
                 onTap: () {
                   // Navigation vers le scanner
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ouverture du Scanner')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>  ScanQRCodeScreen(),
+                    ),
                   );
                 },
               ),
