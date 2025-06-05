@@ -1,10 +1,4 @@
 import 'package:eneam/screens/atd_fail_screen.dart';
-import 'package:eneam/screens/atd_history_screen.dart';
-import 'package:eneam/screens/atd_submit_screen.dart';
-import 'package:eneam/screens/atd_success_screen.dart';
-import 'package:eneam/screens/profile_screen.dart';
-import 'package:eneam/screens/scanqrcode_screen.dart';
-import 'package:eneam/screens/timetable_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart'; // Import de l'écran d'accueil
 
