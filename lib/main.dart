@@ -1,10 +1,5 @@
 import 'package:eneam/screens/atd_fail_screen.dart';
-import 'package:eneam/screens/atd_history_screen.dart';
-import 'package:eneam/screens/atd_submit_screen.dart';
-import 'package:eneam/screens/atd_success_screen.dart';
-import 'package:eneam/screens/profile_screen.dart';
-import 'package:eneam/screens/scanqrcode_screen.dart';
-import 'package:eneam/screens/timetable_screen.dart';
+import 'package:eneam/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart'; // Import de l'écran d'accueil
 
@@ -71,6 +66,22 @@ class AppLauncher extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const HomeScreen(isSenator: false),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 30),
+              // Bouton pour l'utilisateur normal
+              _buildLaunchButton(
+                context,
+                title: 'Inscription',
+                subtitle: 'Accès standard',
+                icon: Icons.person,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RegisterScreen(),
                     ),
                   );
                 },
