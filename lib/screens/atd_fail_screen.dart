@@ -84,7 +84,7 @@ class GPSErrorScreen extends StatelessWidget {
                       children: [
                         // Illustration scan.png
                         SizedBox(
-                          height: screenHeight * 0.3,
+                          height: 150,
                           child: Image.asset(
                             'assets/erreur-icon-191x191.png',
                             fit: BoxFit.contain,

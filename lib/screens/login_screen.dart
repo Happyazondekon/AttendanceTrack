@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'fgt_password_screen.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -28,13 +29,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFFFFFF), // Blanc
-              Color(0xFF0D147F), // Bleu foncé
-            ],
+          image: DecorationImage(
+            image: AssetImage('assets/bg.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: SafeArea(
@@ -193,6 +190,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           // Process login
                           print('Matricule: ${_matriculeController.text}');
                           print('Password: ${_passwordController.text}');
+
+                          // Navigation vers HomeScreen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomeScreen(isSenator: true),
+                            ),
+                          );
                         }
                       },
                       style: OutlinedButton.styleFrom(

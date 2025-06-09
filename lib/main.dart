@@ -74,9 +74,9 @@ class AppLauncher extends StatelessWidget {
               // Bouton pour l'utilisateur normal
               _buildLaunchButton(
                 context,
-                title: 'Inscription',
-                subtitle: 'Accès standard',
-                icon: Icons.person,
+                title: 'Authentification',
+                subtitle: 'Requis',
+                icon: Icons.login,
                 onTap: () {
                   Navigator.push(
                     context,
