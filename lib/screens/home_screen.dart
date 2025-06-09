@@ -2,7 +2,7 @@ import 'package:eneam/screens/atd_history_screen.dart';
 import 'package:eneam/screens/profile_screen.dart';
 import 'package:eneam/screens/scanqrcode_screen.dart';
 import 'package:eneam/screens/timetable_screen.dart';
-// import 'package:eneam/screens/senator_home_screen.dart';
+import 'package:eneam/screens/senator_home_screen.dart';
 
 import 'package:flutter/material.dart';
 
@@ -151,13 +151,19 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.person_add,
                 title: 'Je suis un Sénateur',
                 isEnabled: isSenator,
-                 
                 onTap: isSenator ? () {
                   // Navigation vers l'espace sénateur
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Navigation vers Espace Sénateur')),
-                  );
+                 Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) => const SenateurScreen()),
+);
                 } : null,
+                // onTap: isSenator ? () {
+                  // Navigation vers l'espace sénateur
+                //   ScaffoldMessenger.of(context).showSnackBar(
+                //     const SnackBar(content: Text('Navigation vers Espace Sénateur')),
+                //   );
+                // } : null,
               ),
             ],
           ),
