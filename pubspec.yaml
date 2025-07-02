@@ -39,6 +39,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   intl: ^0.18.1
+  shared_preferences: ^2.2.0  # Pour le stockage local
+  http: ^0.13.5
+  dio: ^5.1.2
+  cookie_jar: ^4.0.0
+  dio_cookie_manager: ^3.0.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../services/user_manager.dart';
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userEmail = UserManager().user?.email ?? 'Email non disponible';
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -125,50 +128,13 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       Center(
                         child: Text(
-                          'jordydy@gmail.com',
+                          userEmail,
                           style: TextStyle(
                             fontFamily: 'Cabin',
                             color: Colors.white.withOpacity(0.8),
                             fontSize: 16,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 30),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          'Identifiants',
-                          style: TextStyle(
-                            fontFamily: 'Cabin',
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildProfileButton(
-                        context,
-                        icon: Icons.edit,
-                        title: 'Modifier le profil',
-                        onTap: () {
-                          // Action pour modifier le profil
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Modifier le profil')),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 15),
-                      _buildProfileButton(
-                        context,
-                        icon: Icons.lock_outline,
-                        title: 'Changer le mot de passe',
-                        onTap: () {
-                          // Action pour changer le mot de passe
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Changer le mot de passe')),
-                          );
-                        },
                       ),
                       const SizedBox(height: 30),
                       const Padding(

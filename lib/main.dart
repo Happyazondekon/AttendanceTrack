@@ -1,4 +1,5 @@
 import 'package:eneam/screens/atd_fail_screen.dart';
+import 'package:eneam/screens/login_screen.dart';
 import 'package:eneam/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart'; // Import de l'écran d'accueil
@@ -65,7 +66,7 @@ class AppLauncher extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const HomeScreen(isSenator: false),
+                      builder: (context) => const HomeScreen(isSenator: false, nom: '', ),
                     ),
                   );
                 },
@@ -81,7 +82,7 @@ class AppLauncher extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const RegisterScreen(),
+                      builder: (context) => const LoginScreen(),
                     ),
                   );
                 },
@@ -114,7 +115,7 @@ class AppLauncher extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const HomeScreen(isSenator: true),
+                      builder: (context) => const HomeScreen(isSenator: true, nom: '',),
                     ),
                   );
                 },

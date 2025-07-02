@@ -8,10 +8,12 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   final bool isSenator;
+  final String nom;  // Ajout du prénom
 
   const HomeScreen({
     super.key,
-    this.isSenator = false, // Par défaut, l'utilisateur n'est pas sénateur
+    this.isSenator = false,  // Par défaut, pas sénateur
+    required this.nom,     // nom requis
   });
 
   @override
@@ -37,11 +39,11 @@ class HomeScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Bonjour Jordy',
-                    style: TextStyle(
+                  Text(
+                    'Bonjour $nom',  // Affichage dynamique
+                    style: const TextStyle(
                       fontFamily: 'Cabin',
-                      fontSize: 32,
+                      fontSize: 25,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF2D3748),
                     ),
@@ -60,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(
-                          color: Color(0xFF4C51BF),
+                          color: const Color(0xFF4C51BF),
                           width: 2,
                         ),
                       ),
@@ -76,101 +78,93 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-
-          // Image centrale depuis assets
-          SizedBox(
-            height: 250,
-            child: Image.asset(
-              'assets/home.png',
-              fit: BoxFit.contain,
-            ),
-          ),
-
-          const SizedBox(height: 30),
-
-          // Boutons de navigation
-          Column(
-            children: [
-              // Historiques de Présences
-              _buildMenuButton(
-                context,
-                icon: Icons.history,
-                title: 'Historiques de Présences',
-                onTap: () {
-                  // Navigation vers l'historique
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>  AttendanceHistoryScreen(),
-                    ),
-                  );
-                },
+              // Image centrale depuis assets
+              SizedBox(
+                height: 250,
+                child: Image.asset(
+                  'assets/home.png',
+                  fit: BoxFit.contain,
+                ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
-              // Mon Emploi du Temps
-              _buildMenuButton(
-                context,
-                icon: Icons.schedule,
-                title: 'Mon Emploi du Temps',
-                onTap: () {
-                  // Navigation vers l'emploi du temps
-                  Navigator.push(
+              // Boutons de navigation
+              Column(
+                children: [
+                  // Historiques de Présences
+                  _buildMenuButton(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) =>  EmploiDuTempsScreen(),
-                    ),
-                  );
-                },
-              ),
+                    icon: Icons.history,
+                    title: 'Historiques de Présences',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AttendanceHistoryScreen(),
+                        ),
+                      );
+                    },
+                  ),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Scanner pour valider
-              _buildMenuButton(
-                context,
-                icon: Icons.qr_code_scanner,
-                title: 'Scanner pour valider',
-                onTap: () {
-                  // Navigation vers le scanner
-                  Navigator.push(
+                  // Mon Emploi du Temps
+                  _buildMenuButton(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) =>  ScanQRCodeScreen(),
-                    ),
-                  );
-                },
-              ),
+                    icon: Icons.schedule,
+                    title: 'Mon Emploi du Temps',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EmploiDuTempsScreen(),
+                        ),
+                      );
+                    },
+                  ),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Je suis un Sénateur (conditionnel)
-              _buildMenuButton(
-                context,
-                icon: Icons.person_add,
-                title: 'Je suis un Sénateur',
-                isEnabled: isSenator,
-                onTap: isSenator ? () {
-                  // Navigation vers l'espace sénateur
-                 Navigator.push(
-  context,
-  MaterialPageRoute(builder: (context) => const SenateurScreen()),
-);
-                } : null,
-                // onTap: isSenator ? () {
-                  // Navigation vers l'espace sénateur
-                //   ScaffoldMessenger.of(context).showSnackBar(
-                //     const SnackBar(content: Text('Navigation vers Espace Sénateur')),
-                //   );
-                // } : null,
+                  // Scanner pour valider
+                  _buildMenuButton(
+                    context,
+                    icon: Icons.qr_code_scanner,
+                    title: 'Scanner pour valider',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ScanQRCodeScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Je suis un Sénateur (conditionnel)
+                  _buildMenuButton(
+                    context,
+                    icon: Icons.person_add,
+                    title: 'Je suis un Sénateur',
+                    isEnabled: isSenator,
+                    onTap: isSenator
+                        ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SenateurScreen()),
+                      );
+                    }
+                        : null,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
-    ),
-    ),
     );
   }
 
@@ -189,13 +183,15 @@ class HomeScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: isEnabled ? const Color(0xFF4C51BF) : const Color(0xFF9CA3AF),
           borderRadius: BorderRadius.circular(35),
-          boxShadow: isEnabled ? [
+          boxShadow: isEnabled
+              ? [
             BoxShadow(
               color: const Color(0xFF4C51BF).withOpacity(0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
-          ] : null,
+          ]
+              : null,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
