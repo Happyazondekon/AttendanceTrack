@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'dart:io';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:eneam/screens/atd_submit_screen.dart';
 import 'package:eneam/screens/atd_history_screen.dart';
 
@@ -12,43 +11,30 @@ class ScanQRCodeScreen extends StatefulWidget {
 }
 
 class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  QRViewController? controller;
+  MobileScannerController? cameraController;
   bool isScanning = false;
 
-  // Pour éviter les problèmes de hot reload
-  @override
-  void reassemble() {
-    super.reassemble();
-    if (Platform.isAndroid) {
-      controller?.pauseCamera();
-    } else if (Platform.isIOS) {
-      controller?.resumeCamera();
-    }
+  void _startScanning() {
+    setState(() {
+      isScanning = true;
+      cameraController = MobileScannerController(
+        facing: CameraFacing.back,
+        torchEnabled: false,
+      );
+    });
   }
 
-  void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
-      if (scanData.code != null) {
-        controller.pauseCamera();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PresenceValidationScreen(qrCode: scanData.code!),
-          ),
-        ).then((_) {
-          if (mounted) {
-            controller.resumeCamera();
-          }
-        });
-      }
+  void _stopScanning() {
+    setState(() {
+      isScanning = false;
+      cameraController?.dispose();
+      cameraController = null;
     });
   }
 
   @override
   void dispose() {
-    controller?.dispose();
+    cameraController?.dispose();
     super.dispose();
   }
 
@@ -76,7 +62,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // Header avec bouton retour et titre
+                // Header
                 Row(
                   children: [
                     GestureDetector(
@@ -125,19 +111,30 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                 // Zone de scan ou illustration
                 Expanded(
                   flex: 3,
-                  child: isScanning
+                  child: isScanning && cameraController != null
                       ? ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: QRView(
-                      key: qrKey,
-                      onQRViewCreated: _onQRViewCreated,
-                      overlay: QrScannerOverlayShape(
-                        borderColor: Color(0xFF4C51BF),
-                        borderRadius: 10,
-                        borderLength: 30,
-                        borderWidth: 10,
-                        cutOutSize: screenWidth * 0.8,
-                      ),
+                    child: MobileScanner(
+                      controller: cameraController!,
+                      onDetect: (capture) {
+                        final List<Barcode> barcodes = capture.barcodes;
+                        if (barcodes.isNotEmpty) {
+                          final String? code = barcodes.first.rawValue;
+                          if (code != null) {
+                            _stopScanning();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PresenceValidationScreen(qrCode: code),
+                              ),
+                            ).then((_) {
+                              if (mounted) {
+                                _startScanning();
+                              }
+                            });
+                          }
+                        }
+                      },
                     ),
                   )
                       : Center(
@@ -162,27 +159,24 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Bouton Scanner un QR Code
+                      // Bouton Scanner
                       _buildActionButton(
                         context,
                         icon: isScanning ? Icons.stop : Icons.qr_code_scanner,
                         title: isScanning ? 'Arrêter le scan' : 'Scanner un QR Code',
                         isPrimary: true,
                         onTap: () {
-                          setState(() {
-                            isScanning = !isScanning;
-                          });
-                          if (!isScanning) {
-                            controller?.pauseCamera();
+                          if (isScanning) {
+                            _stopScanning();
                           } else {
-                            controller?.resumeCamera();
+                            _startScanning();
                           }
                         },
                       ),
 
                       const SizedBox(height: 16),
 
-                      // Bouton Historiques de Présences
+                      // Autres boutons
                       if (!isScanning) ...[
                         _buildActionButton(
                           context,
@@ -201,7 +195,6 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Bouton Retourner à l'accueil
                         _buildActionButton(
                           context,
                           icon: Icons.home,
@@ -224,7 +217,6 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
       ),
     );
   }
-
   Widget _buildActionButton(
       BuildContext context, {
         required IconData icon,

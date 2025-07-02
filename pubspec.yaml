@@ -44,7 +44,7 @@ dev_dependencies:
   dio: ^5.1.2
   cookie_jar: ^4.0.0
   dio_cookie_manager: ^3.0.0
-  qr_code_scanner: ^1.0.1
+  mobile_scanner: ^3.4.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
