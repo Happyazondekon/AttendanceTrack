@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 // Écran principal de validation de présence
 class PresenceValidationScreen extends StatefulWidget {
+  final String qrCode;
+
+  const PresenceValidationScreen({
+    Key? key,
+    required this.qrCode,
+  }) : super(key: key);
   @override
   _PresenceValidationScreenState createState() =>
       _PresenceValidationScreenState();

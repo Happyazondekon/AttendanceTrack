@@ -2,6 +2,7 @@ import 'package:eneam/screens/atd_submit_screen.dart';
 import 'package:flutter/material.dart';
 
 class GPSErrorScreen extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -136,7 +137,7 @@ class GPSErrorScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>  PresenceValidationScreen(),
+                              builder: (context) =>  PresenceValidationScreen(qrCode: '',),
                             ),
                           );
                         },

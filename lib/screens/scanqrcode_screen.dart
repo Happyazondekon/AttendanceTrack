@@ -1,12 +1,56 @@
-import 'package:eneam/screens/atd_history_screen.dart';
-import 'package:eneam/screens/atd_submit_screen.dart';
-import 'package:eneam/screens/atd_success_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'dart:io';
+import 'package:eneam/screens/atd_submit_screen.dart';
+import 'package:eneam/screens/atd_history_screen.dart';
 
-import 'atd_fail_screen.dart';
+class ScanQRCodeScreen extends StatefulWidget {
+  const ScanQRCodeScreen({Key? key}) : super(key: key);
 
-class ScanQRCodeScreen extends StatelessWidget {
-  const ScanQRCodeScreen({super.key});
+  @override
+  State<ScanQRCodeScreen> createState() => _ScanQRCodeScreenState();
+}
+
+class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  QRViewController? controller;
+  bool isScanning = false;
+
+  // Pour éviter les problèmes de hot reload
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller?.pauseCamera();
+    } else if (Platform.isIOS) {
+      controller?.resumeCamera();
+    }
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) {
+      if (scanData.code != null) {
+        controller.pauseCamera();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PresenceValidationScreen(qrCode: scanData.code!),
+          ),
+        ).then((_) {
+          if (mounted) {
+            controller.resumeCamera();
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +64,8 @@ class ScanQRCodeScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFE6E6FA), // Lavande clair
-              Color(0xFF4C51BF), // Bleu profond
+              Color(0xFFE6E6FA),
+              Color(0xFF4C51BF),
             ],
             stops: [0.3, 1.0],
           ),
@@ -32,7 +76,6 @@ class ScanQRCodeScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-
                 // Header avec bouton retour et titre
                 Row(
                   children: [
@@ -60,7 +103,7 @@ class ScanQRCodeScreen extends StatelessWidget {
                     ),
                     Expanded(
                       child: Container(
-                        margin: const EdgeInsets.only(right: 44), // Compense la largeur du bouton retour
+                        margin: const EdgeInsets.only(right: 44),
                         child: const Text(
                           'Scanner QR Code',
                           style: TextStyle(
@@ -77,17 +120,30 @@ class ScanQRCodeScreen extends StatelessWidget {
                   ],
                 ),
 
-                // Espace flexible pour centrer le QR code
                 SizedBox(height: screenHeight * 0.08),
 
-                // Zone d'illustration principale
+                // Zone de scan ou illustration
                 Expanded(
                   flex: 3,
-                  child: Center(
+                  child: isScanning
+                      ? ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: QRView(
+                      key: qrKey,
+                      onQRViewCreated: _onQRViewCreated,
+                      overlay: QrScannerOverlayShape(
+                        borderColor: Color(0xFF4C51BF),
+                        borderRadius: 10,
+                        borderLength: 30,
+                        borderWidth: 10,
+                        cutOutSize: screenWidth * 0.8,
+                      ),
+                    ),
+                  )
+                      : Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Illustration scan.png
                         SizedBox(
                           height: screenHeight * 0.4,
                           child: Image.asset(
@@ -109,49 +165,53 @@ class ScanQRCodeScreen extends StatelessWidget {
                       // Bouton Scanner un QR Code
                       _buildActionButton(
                         context,
-                        icon: Icons.qr_code_scanner,
-                        title: 'Scanner un QR Code',
+                        icon: isScanning ? Icons.stop : Icons.qr_code_scanner,
+                        title: isScanning ? 'Arrêter le scan' : 'Scanner un QR Code',
                         isPrimary: true,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>  PresenceValidationScreen(),
-                            ),
-                          );
+                          setState(() {
+                            isScanning = !isScanning;
+                          });
+                          if (!isScanning) {
+                            controller?.pauseCamera();
+                          } else {
+                            controller?.resumeCamera();
+                          }
                         },
                       ),
 
                       const SizedBox(height: 16),
 
                       // Bouton Historiques de Présences
-                      _buildActionButton(
-                        context,
-                        icon: Icons.history,
-                        title: 'Historiques de Présences',
-                        isPrimary: false,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>  AttendanceHistoryScreen(),
-                            ),
-                          );
-                        },
-                      ),
+                      if (!isScanning) ...[
+                        _buildActionButton(
+                          context,
+                          icon: Icons.history,
+                          title: 'Historiques de Présences',
+                          isPrimary: false,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AttendanceHistoryScreen(),
+                              ),
+                            );
+                          },
+                        ),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      // Bouton Retourner à l'accueil
-                      _buildActionButton(
-                        context,
-                        icon: Icons.home,
-                        title: 'Retourner à l\'accueil',
-                        isPrimary: false,
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
+                        // Bouton Retourner à l'accueil
+                        _buildActionButton(
+                          context,
+                          icon: Icons.home,
+                          title: 'Retourner à l\'accueil',
+                          isPrimary: false,
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -164,8 +224,6 @@ class ScanQRCodeScreen extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _buildActionButton(
       BuildContext context, {
