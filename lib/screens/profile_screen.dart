@@ -129,16 +129,29 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Center(
-                        child: Text(
-                          userEmail,
-                          style: TextStyle(
-                            fontFamily: 'Cabin',
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    userEmail,
+                    style: TextStyle(
+                      fontFamily: 'Cabin',
+                      color: Colors.white.withOpacity(0.85),
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    'Matricule : ${UserManager().user?.matricule ?? 'Indisponible'}',
+                    style: TextStyle(
+                      fontFamily: 'Cabin',
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
+            ),
                       const SizedBox(height: 30),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10),

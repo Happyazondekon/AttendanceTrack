@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../services/token_service.dart';
 
-// Écran principal de validation de présence
 class PresenceValidationScreen extends StatefulWidget {
   final String qrCode;
 
@@ -8,276 +11,177 @@ class PresenceValidationScreen extends StatefulWidget {
     Key? key,
     required this.qrCode,
   }) : super(key: key);
+
   @override
-  _PresenceValidationScreenState createState() =>
-      _PresenceValidationScreenState();
+  _PresenceValidationScreenState createState() => _PresenceValidationScreenState();
 }
 
 class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
+  bool isSubmitting = false;
+
+  Future<void> atdSubmit() async {
+    setState(() => isSubmitting = true);
+
+    try {
+      // Vérifier et demander les permissions de localisation
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) throw Exception('Service de localisation désactivé.');
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+          throw Exception('Permission de localisation refusée.');
+        }
+      }
+
+      // Obtenir la position actuelle
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+      // Récupérer le token de l’utilisateur
+      final token = await TokenService().getToken();
+      if (token == null) throw Exception("Token utilisateur non disponible.");
+
+      // Envoyer la requête
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/api/valider'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: {
+          'qr_code': widget.qrCode,
+          'latitude': position.latitude.toString(),
+          'longitude': position.longitude.toString(),
+        },
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Présence validée avec succès."),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context); // Retour automatique
+      } else {
+        throw Exception(data['message'] ?? "Échec de la validation.");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur : ${e.toString()}"), backgroundColor: Colors.red),
+      );
+    } finally {
+      setState(() => isSubmitting = false);
+    }
+  }
+
+  void _showValidationDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.check_circle, color: Colors.green),
+            SizedBox(width: 10),
+            Text('Valider Présence'),
+          ],
+        ),
+        content: const Text("Confirmez-vous votre présence ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              atdSubmit();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4C51BF)),
+            child: const Text('Valider', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
+            colors: [Color(0xFFE6E6FA), Color(0xFF4C51BF)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE6E6FA), // Lavande clair
-              Color(0xFF4C51BF), // Bleu profond
-            ],
-            stops: [0.3, 1.0],
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-
-              // En-tête avec bouton retour et titre
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(
-                            color: const Color(0xFF4C51BF).withOpacity(0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: Color(0xFF1A202C),
-                          size: 22,
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        "Valider Présence",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A365D),
                         ),
                       ),
                     ),
-
-                    // Titre centré
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 44),
-                        child: const Text(
-                          'Valider Présence',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A365D),
-                            letterSpacing: -0.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
+                    const SizedBox(width: 44), // Placeholder pour alignement
                   ],
                 ),
-              ),
-
-              const SizedBox(height: 200),
-
-              // Contenu principal avec scroll
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      // Bouton Position GPS
-                      _buildMenuButton(
-                        context,
-                        icon: Icons.qr_code_scanner,
-                        title: 'Position GPS',
-                        isPrimary: true,
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Position GPS vérifiée'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Section cours
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 20,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Mathématiques',
-                                    style: TextStyle(
-                                      color: Color(0xFF4338CA),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    '08:00 à 13:00',
-                                    style: TextStyle(
-                                      color: Colors.grey[500],
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Icon(
-                                  Icons.arrow_back_ios_new_outlined, // ou Icons.keyboard_arrow_down
-                                  size: 28,
-                                  color: Colors.blue[600],
-                                ),
-                              ],
-                            ),
-
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Bouton Valider présence
-                      _buildMenuButton(
-                        context,
-                        icon: Icons.person,
-                        title: 'Valider la présence',
-                        isPrimary: true,
-                        onTap: () {
-                          _showValidationDialog(context);
-                        },
-                      ),
-
-                      const SizedBox(height: 30),
-                    ],
-                  ),
+                const Spacer(),
+                _buildMenuButton(
+                  context,
+                  title: "Valider la présence",
+                  icon: Icons.person,
+                  onTap: isSubmitting ? null : _showValidationDialog,
                 ),
-              ),
-            ],
+                const Spacer(),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // Dialog de validation
-  void _showValidationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 28),
-              SizedBox(width: 10),
-              Text('Valider Présence'),
-            ],
-          ),
-          content: const Text(
-            'Voulez-vous confirmer votre présence pour le cours de Mathématiques ?',
-            style: TextStyle(fontSize: 16),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Annuler', style: TextStyle(color: Colors.grey[600])),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Présence validée avec succès !'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4C51BF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                'Valider',
-                style: TextStyle(color: Colors.white),
-              ),
+  Widget _buildMenuButton(
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        VoidCallback? onTap,
+      }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 64,
+        decoration: BoxDecoration(
+          color: const Color(0xFF4C51BF),
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF4C51BF).withOpacity(0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
-        );
-      },
-    );
-  }
-}
-
-// Composant personnalisé pour le bouton avec icône (amélioré)
-Widget _buildMenuButton(
-  BuildContext context, {
-  required IconData icon,
-  required String title,
-  required VoidCallback? onTap,
-  required bool isPrimary,
-  bool isEnabled = true,
-}) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
-      width: double.infinity,
-      height: 64,
-      decoration: BoxDecoration(
-        color:
-            isPrimary
-                ? const Color(0xFF4C51BF)
-                : const Color(0xFF4C51BF).withOpacity(0.85),
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF4C51BF).withOpacity(0.25),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Padding(
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 28),
         child: Row(
           children: [
@@ -288,24 +192,22 @@ Widget _buildMenuButton(
                 color: Colors.white.withOpacity(0.25),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(icon, color: Colors.white, size: 22),
+              child: Icon(icon, color: Colors.white),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontFamily: 'Cabin',
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
-                  letterSpacing: -0.2,
                 ),
               ),
             ),
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }

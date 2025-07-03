@@ -13,6 +13,7 @@ class User {
   final String dateValidation;
   final bool? isResponsable;
   final int classeId;
+  final String? token; // Ajout du token
 
   User({
     required this.id,
@@ -29,6 +30,7 @@ class User {
     required this.dateValidation,
     this.isResponsable,
     required this.classeId,
+    this.token,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -46,5 +48,6 @@ class User {
     dateValidation: json['date_validation'],
     isResponsable: json['is_responsable'],
     classeId: json['classe_id'],
+    token: json['token'], // Ajout du token
   );
 }
