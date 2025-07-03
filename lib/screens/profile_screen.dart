@@ -1,3 +1,6 @@
+import 'package:eneam/screens/atd_history_screen.dart';
+import 'package:eneam/screens/home_screen.dart';
+import 'package:eneam/screens/timetable_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../services/user_manager.dart';
@@ -155,9 +158,11 @@ class ProfileScreen extends StatelessWidget {
                         icon: Icons.history,
                         title: 'Historiques de Présences',
                         onTap: () {
-                          // Action pour historiques de présences
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Historiques de Présences')),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AttendanceHistoryScreen(),
+                            ),
                           );
                         },
                       ),
@@ -167,9 +172,11 @@ class ProfileScreen extends StatelessWidget {
                         icon: Icons.calendar_today_outlined,
                         title: 'Mon Emploi du Temps',
                         onTap: () {
-                          // Action pour mon emploi du temps
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Mon Emploi du Temps')),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EmploiDuTempsScreen(),
+                            ),
                           );
                         },
                       ),
@@ -179,7 +186,12 @@ class ProfileScreen extends StatelessWidget {
                         icon: Icons.home_outlined,
                         title: 'Retourner à l\'accueil',
                         onTap: () {
-                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomeScreen(nom: '',),
+                            ),
+                          );
                         },
                       ),
                     ],
