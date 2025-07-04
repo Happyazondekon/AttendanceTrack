@@ -100,54 +100,111 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        // Vérifier si la réponse est valide avant de parser
+        if (response.body.isEmpty) {
+          throw Exception('Réponse vide du serveur');
+        }
+
+        dynamic data;
+        try {
+          data = json.decode(response.body);
+        } catch (e) {
+          print('Erreur JSON parsing: $e');
+          throw Exception('Erreur de format JSON: ${e.toString()}');
+        }
 
         if (data['data'] is List) {
           final currentDateStr = DateFormat('yyyy-MM-dd').format(selectedDate);
 
           setState(() {
             scheduleData = (data['data'] as List).map((course) {
-              // Conversion des dates UTC
+              // Conversion sécurisée des dates
               DateTime? dateDebut;
               try {
-                dateDebut = DateTime.parse(course['date_debut']);
+                if (course['date_debut'] != null && course['date_debut'].toString().isNotEmpty) {
+                  dateDebut = DateTime.parse(course['date_debut'].toString());
+                }
               } catch (e) {
-                print('Erreur parsing date: $e');
+                print('Erreur parsing date_debut: $e');
+                dateDebut = null;
               }
 
-              String matiere = course['ue'] != null ?
-              course['ue']['nom']?.toString() ?? 'N/A' :
-              course['code_ue']?.toString() ?? 'N/A';
+              // Récupération sécurisée de la matière
+              String matiere = 'N/A';
+              try {
+                if (course['ue'] != null && course['ue']['nom'] != null) {
+                  matiere = course['ue']['nom'].toString();
+                } else if (course['code_ue'] != null) {
+                  matiere = course['code_ue'].toString();
+                }
+              } catch (e) {
+                print('Erreur parsing matiere: $e');
+              }
 
-              String enseignant = course['user'] != null ?
-              '${course['user']['prenom']} ${course['user']['nom']}' :
-              'N/A';
+              // Récupération sécurisée de l'enseignant
+              String enseignant = 'N/A';
+              try {
+                if (course['user'] != null &&
+                    course['user']['prenom'] != null &&
+                    course['user']['nom'] != null) {
+                  enseignant = '${course['user']['prenom']} ${course['user']['nom']}';
+                }
+              } catch (e) {
+                print('Erreur parsing enseignant: $e');
+              }
 
-              // Formatage des heures
+              // Formatage sécurisé des heures
               String plageDebut = '';
               String plageFin = '';
               try {
-                if (course['plage_debut'] != null) {
-                  final dateTimeDebut = DateTime.parse(course['plage_debut']);
+                if (course['plage_debut'] != null && course['plage_debut'].toString().isNotEmpty) {
+                  final dateTimeDebut = DateTime.parse(course['plage_debut'].toString());
                   plageDebut = DateFormat('HH:mm').format(dateTimeDebut);
                 }
-                if (course['plage_fin'] != null) {
-                  final dateTimeFin = DateTime.parse(course['plage_fin']);
+              } catch (e) {
+                print('Erreur parsing plage_debut: $e');
+              }
+
+              try {
+                if (course['plage_fin'] != null && course['plage_fin'].toString().isNotEmpty) {
+                  final dateTimeFin = DateTime.parse(course['plage_fin'].toString());
                   plageFin = DateFormat('HH:mm').format(dateTimeFin);
                 }
               } catch (e) {
-                print('Erreur parsing heure: $e');
+                print('Erreur parsing plage_fin: $e');
+              }
+
+              // Récupération sécurisée de la salle
+              String salle = 'N/A';
+              try {
+                if (course['salle'] != null) {
+                  salle = course['salle'].toString();
+                }
+              } catch (e) {
+                print('Erreur parsing salle: $e');
+              }
+
+              // Récupération sécurisée de classe_id
+              int classeId = 0;
+              try {
+                if (course['classe_id'] != null) {
+                  if (course['classe_id'] is int) {
+                    classeId = course['classe_id'];
+                  } else {
+                    classeId = int.tryParse(course['classe_id'].toString()) ?? 0;
+                  }
+                }
+              } catch (e) {
+                print('Erreur parsing classe_id: $e');
               }
 
               return {
                 'matiere': matiere,
                 'plage_debut': plageDebut,
                 'plage_fin': plageFin,
-                'salle': course['salle']?.toString() ?? 'N/A',
+                'salle': salle,
                 'enseignant': enseignant,
-                'classe_id': course['classe_id'] is int
-                    ? course['classe_id']
-                    : int.tryParse(course['classe_id']?.toString() ?? '0') ?? 0,
+                'classe_id': classeId,
                 'date_debut': dateDebut != null ? DateFormat('yyyy-MM-dd').format(dateDebut) : '',
               };
             }).where((course) {
@@ -157,13 +214,16 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
             }).toList();
 
             // Tri par heure de début
-            scheduleData.sort((a, b) =>
-                (a['plage_debut'] ?? '').compareTo(b['plage_debut'] ?? ''));
+            scheduleData.sort((a, b) {
+              String timeA = a['plage_debut'] ?? '';
+              String timeB = b['plage_debut'] ?? '';
+              return timeA.compareTo(timeB);
+            });
 
             isLoading = false;
           });
         } else {
-          throw Exception('Format de données incorrect');
+          throw Exception('Format de données incorrect - data n\'est pas une liste');
         }
       } else {
         throw Exception('Échec du chargement de l\'emploi du temps: ${response.statusCode}');
@@ -288,7 +348,9 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '$startTime à $endTime',
+            startTime.isNotEmpty && endTime.isNotEmpty
+                ? '$startTime à $endTime'
+                : 'Horaires non définis',
             style: const TextStyle(
               fontFamily: 'Cabin',
               fontSize: 14,
@@ -314,7 +376,11 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
 
   String _formatSelectedDate() {
     if (!isLocaleInitialized) return '';
-    return DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(selectedDate);
+    try {
+      return DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(selectedDate);
+    } catch (e) {
+      return DateFormat('yyyy-MM-dd').format(selectedDate);
+    }
   }
 
   @override
