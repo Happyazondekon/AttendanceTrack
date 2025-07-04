@@ -112,21 +112,26 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
               }
 
               // Récupération des informations du cours et de l'UE
-              final cours = attendance['cours'];
-              final ue = cours['ue'];
+
+              // On lit directement l'objet ue attaché à la présence
+              final ue = attendance['ue'];
 
               return {
                 'id': attendance['id'],
-                'date_presence': datePresence != null ?
-                DateFormat('yyyy-MM-dd').format(datePresence) : '',
-                'heure': datePresence != null ?
-                DateFormat('HH:mm').format(datePresence) : 'N/A',
+                'date_presence': datePresence != null
+                    ? DateFormat('yyyy-MM-dd').format(datePresence)
+                    : '',
+                'heure': datePresence != null
+                    ? DateFormat('HH:mm').format(datePresence)
+                    : 'N/A',
                 'status': attendance['status'] ?? 'N/A',
                 'present': attendance['status'] == 'present',
-                'matiere': ue['nom'] ?? 'Matière non définie',
-                'code_ue': ue['code'] ?? 'N/A',
+                'matiere': ue?['nom'] ?? 'Matière non définie',
+                'code_ue': ue?['code'] ?? 'N/A',
                 'valide': attendance['valide'] == 1,
               };
+
+
             }).where((attendance) {
               return attendance['date_presence'] == currentDateStr;
             }).toList();
