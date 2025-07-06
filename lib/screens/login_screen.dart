@@ -127,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             context,
             MaterialPageRoute(
               builder: (context) => HomeScreen(
-                isSenator: false,
+                isSenator: true,
                 nom: nom,
               ),
             ),

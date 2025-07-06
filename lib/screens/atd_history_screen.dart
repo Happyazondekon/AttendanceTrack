@@ -448,12 +448,12 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: const Color(0xFF4C51BF).withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
                             child: const Icon(
-                              Icons.arrow_back_ios_new,
+                              Icons.arrow_back,
                               color: Color(0xFF1A202C),
                               size: 20,
                             ),
@@ -467,8 +467,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                               style: TextStyle(
                                 fontFamily: 'Cabin',
                                 fontSize: 26,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFF1A365D),
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF2D3748),
                                 letterSpacing: -0.8,
                               ),
                               textAlign: TextAlign.center,

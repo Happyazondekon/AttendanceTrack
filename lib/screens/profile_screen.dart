@@ -104,27 +104,6 @@ class ProfileScreen extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                width: 35,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(0xFF4C51BF),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.edit,
-                                  size: 18,
-                                  color: Color(0xFF4C51BF),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -205,7 +184,7 @@ class ProfileScreen extends StatelessWidget {
                         title: 'Retour à l\'Accueil',
                         subtitle: 'Retournez au menu principal',
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFFA709A), Color(0xFFFEE140)],
+                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                         ),
                         onTap: () {
                           Navigator.pushReplacement(

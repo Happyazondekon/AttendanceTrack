@@ -294,7 +294,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                           colors: [Color(0xFFFF6B6B), Color(0xFFFF8E8E)],
                         )
                             : const LinearGradient(
-                          colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
+                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                         ),
                         onTap: () {
                           if (isScanning) {
@@ -314,7 +314,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                           title: 'Historique de Présences',
                           subtitle: 'Consultez vos présences passées',
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                            colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
                           ),
                           onTap: () {
                             Navigator.push(
@@ -334,7 +334,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                           title: 'Retour à l\'accueil',
                           subtitle: 'Retournez au menu principal',
                           gradient: const LinearGradient(
-                            colors: [Color(0xFFFA709A), Color(0xFFFEE140)],
+                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                           ),
                           onTap: () {
                             Navigator.pop(context);

@@ -186,7 +186,7 @@ class HomeScreen extends StatelessWidget {
                         title: 'Scanner pour valider',
                         subtitle: 'Scannez un QR code pour marquer votre présence',
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFFA709A), Color(0xFFFEE140)],
+                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                         ),
                         onTap: () {
                           Navigator.push(
