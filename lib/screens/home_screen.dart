@@ -110,6 +110,14 @@ class HomeScreen extends StatelessWidget {
                 Container(
                   height: 220,
                   width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Lottie.asset(
@@ -162,7 +170,7 @@ class HomeScreen extends StatelessWidget {
 
                       _buildModernMenuButton(
                         context,
-                        icon: Icons.schedule,
+                        icon: Icons.calendar_today_outlined,
                         title: 'Mon Emploi du Temps',
                         subtitle: 'Visualisez votre planning',
                         gradient: const LinearGradient(

@@ -121,17 +121,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         if (response.statusCode == 200 && response.data['success'] == true) {
           final nom = response.data['data']['nom'] ?? 'Utilisateur';
           final userData = response.data['data'];
-          UserManager().setUser(User.fromJson(userData));
+          await UserManager().setUser(User.fromJson(userData)); // Modifié ici
 
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomeScreen(
-                isSenator: true,
-                nom: nom,
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                  isSenator: true,
+                  nom: nom,
+                ),
               ),
-            ),
-          );
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

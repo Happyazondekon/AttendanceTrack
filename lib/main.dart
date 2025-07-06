@@ -1,11 +1,16 @@
 import 'package:eneam/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:eneam/services/user_manager.dart';
+import 'package:eneam/screens/home_screen.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+  // Charger l'utilisateur au démarrage
+  await UserManager().loadUser();
+
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -19,7 +24,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Cabin',
       ),
-      home: const LoginScreen(),
+      home: UserManager().user != null ? HomeScreen(
+        isSenator: true,
+        nom: UserManager().user?.nom ?? 'Utilisateur',
+      ) : const LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

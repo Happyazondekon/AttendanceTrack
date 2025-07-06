@@ -13,7 +13,7 @@ class User {
   final String dateValidation;
   final bool? isResponsable;
   final int classeId;
-  final String? token; // Ajout du token
+  final String? token;
 
   User({
     required this.id,
@@ -48,6 +48,25 @@ class User {
     dateValidation: json['date_validation'],
     isResponsable: json['is_responsable'],
     classeId: json['classe_id'],
-    token: json['token'], // Ajout du token
+    token: json['token'],
   );
+
+  // Ajout de la méthode toJson
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'matricule': matricule,
+    'nom': nom,
+    'prenoms': prenoms,
+    'email': email,
+    'date_naissance': dateNaissance.toIso8601String(),
+    'lieu_naissance': lieuNaissance,
+    'sexe': sexe,
+    'nationalite': nationalite,
+    'telephone': telephone,
+    'annee_etude': anneeEtude,
+    'date_validation': dateValidation,
+    'is_responsable': isResponsable,
+    'classe_id': classeId,
+    'token': token,
+  };
 }

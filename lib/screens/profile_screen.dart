@@ -2,6 +2,7 @@ import 'package:eneam/screens/atd_history_screen.dart';
 import 'package:eneam/screens/home_screen.dart';
 import 'package:eneam/screens/timetable_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:eneam/screens/login_screen.dart';
 
 import '../services/user_manager.dart';
 
@@ -449,63 +450,67 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _performLogout(BuildContext context) {
-    // Logique de déconnexion
+  void _performLogout(BuildContext context) async {  // Ajout du async
     try {
-      // Nettoyer les données utilisateur
-      UserManager().clearUser();
+      // Nettoyer les données utilisateur de manière sécurisée
+      await UserManager().clearUser();  // Utilisation de await car maintenant c'est asynchrone
 
       // Afficher un message de confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Déconnexion réussie',
-                style: TextStyle(
-                  fontFamily: 'Cabin',
-                  fontWeight: FontWeight.w500,
+      if (context.mounted) {  // Vérification que le contexte est toujours valide
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 10),
+                Text(
+                  'Déconnexion réussie',
+                  style: TextStyle(
+                    fontFamily: 'Cabin',
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+        );
 
-      // Rediriger vers l'écran de connexion
-      // Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-
+        // Redirection vers l'écran de connexion en effaçant la pile de navigation
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (route) => false,  // Ceci supprime toutes les routes précédentes
+        );
+      }
     } catch (e) {
-      // Gérer les erreurs
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Erreur lors de la déconnexion',
-                style: TextStyle(
-                  fontFamily: 'Cabin',
-                  fontWeight: FontWeight.w500,
+      if (context.mounted) {  // Vérification que le contexte est toujours valide
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.error, color: Colors.white),
+                SizedBox(width: 10),
+                Text(
+                  'Erreur lors de la déconnexion',
+                  style: TextStyle(
+                    fontFamily: 'Cabin',
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+        );
+      }
     }
   }
 }
