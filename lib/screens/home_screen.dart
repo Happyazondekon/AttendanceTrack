@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Bonjour,',
+                            'Salut,',
                             style: TextStyle(
                               fontFamily: 'Cabin',
                               fontSize: 18,
@@ -217,7 +217,7 @@ class HomeScreen extends StatelessWidget {
                             : 'Fonction non disponible',
                         gradient: isSenator
                             ? const LinearGradient(
-                          colors: [Color(0xFFFF9A9E), Color(0xFFFECFEF)],
+                          colors: [Color(0xFF1C2674), Color(0xFFFECFEF)],
                         )
                             : LinearGradient(
                           colors: [
