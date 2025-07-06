@@ -100,7 +100,6 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Vérifier si la réponse est valide avant de parser
         if (response.body.isEmpty) {
           throw Exception('Réponse vide du serveur');
         }
@@ -118,7 +117,6 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
 
           setState(() {
             scheduleData = (data['data'] as List).map((course) {
-              // Conversion sécurisée des dates
               DateTime? dateDebut;
               try {
                 if (course['date_debut'] != null && course['date_debut'].toString().isNotEmpty) {
@@ -129,7 +127,6 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                 dateDebut = null;
               }
 
-              // Récupération sécurisée de la matière
               String matiere = 'N/A';
               try {
                 if (course['ue'] != null && course['ue']['nom'] != null) {
@@ -141,7 +138,6 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                 print('Erreur parsing matiere: $e');
               }
 
-              // Récupération sécurisée de l'enseignant
               String enseignant = 'N/A';
               try {
                 if (course['user'] != null &&
@@ -153,7 +149,6 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                 print('Erreur parsing enseignant: $e');
               }
 
-              // Formatage sécurisé des heures
               String plageDebut = '';
               String plageFin = '';
               try {
@@ -174,7 +169,6 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                 print('Erreur parsing plage_fin: $e');
               }
 
-              // Récupération sécurisée de la salle
               String salle = 'N/A';
               try {
                 if (course['salle'] != null) {
@@ -184,7 +178,6 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                 print('Erreur parsing salle: $e');
               }
 
-              // Récupération sécurisée de classe_id
               int classeId = 0;
               try {
                 if (course['classe_id'] != null) {
@@ -208,12 +201,10 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                 'date_debut': dateDebut != null ? DateFormat('yyyy-MM-dd').format(dateDebut) : '',
               };
             }).where((course) {
-              // Filtrer par classe et date
               return course['classe_id'] == user.classeId &&
                   course['date_debut'] == currentDateStr;
             }).toList();
 
-            // Tri par heure de début
             scheduleData.sort((a, b) {
               String timeA = a['plage_debut'] ?? '';
               String timeB = b['plage_debut'] ?? '';
@@ -239,10 +230,12 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
 
   Widget _buildDaySelector() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: const Color(0xFFF8F9FF),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -250,51 +243,69 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
           bool isSelected = day['date'].day == selectedDate.day &&
               day['date'].month == selectedDate.month &&
               day['date'].year == selectedDate.year;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedDate = day['date'];
-              });
-              fetchSchedule();
-            },
-            child: Column(
-              children: [
-                Text(
-                  day['day'],
-                  style: TextStyle(
-                    fontFamily: 'Cabin',
-                    fontSize: 13,
-                    color: isSelected ? Color(0xFF4338CA) : Color(0xFF9CA3AF),
-                    fontWeight: FontWeight.w500,
-                  ),
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedDate = day['date'];
+                });
+                fetchSchedule();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFF4338CA) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: isSelected ? [
+                    BoxShadow(
+                      color: const Color(0xFF4338CA).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ] : null,
                 ),
-                SizedBox(height: 8),
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: isSelected ? Color(0xFF4338CA) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Center(
-                    child: Text(
-                      day['dayNumber'].toString(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      day['day'],
                       style: TextStyle(
                         fontFamily: 'Cabin',
-                        fontSize: 15,
-                        color: isSelected ? Colors.white : Color(0xFF374151),
+                        fontSize: 12,
+                        color: isSelected ? Colors.white : const Color(0xFF9CA3AF),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    Text(
+                      day['dayNumber'].toString(),
+                      style: TextStyle(
+                        fontFamily: 'Cabin',
+                        fontSize: 16,
+                        color: isSelected ? Colors.white : const Color(0xFF374151),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           );
         }).toList(),
       ),
     );
   }
+
+  List<Color> get courseColors => [
+    const Color(0xFF4F46E5),
+    const Color(0xFF059669),
+    const Color(0xFFDC2626),
+    const Color(0xFF7C3AED),
+    const Color(0xFFEA580C),
+    const Color(0xFF0891B2),
+    const Color(0xFFBE185D),
+    const Color(0xFF65A30D),
+  ];
 
   Widget _buildCourseCard(
       String subject,
@@ -303,71 +314,178 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
       String room,
       String teacher,
       Color accentColor,
+      int index,
       ) {
+    final isToday = selectedDate.day == DateTime.now().day &&
+        selectedDate.month == DateTime.now().month &&
+        selectedDate.year == DateTime.now().year;
+
+    final now = DateTime.now();
+    final currentTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    final isCurrentCourse = isToday && startTime.isNotEmpty && endTime.isNotEmpty &&
+        currentTime.compareTo(startTime) >= 0 && currentTime.compareTo(endTime) <= 0;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accentColor.withOpacity(0.2), width: 1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isCurrentCourse ? accentColor : accentColor.withOpacity(0.15),
+          width: isCurrentCourse ? 2 : 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: accentColor.withOpacity(0.08),
-            blurRadius: 12,
+            color: accentColor.withOpacity(isCurrentCourse ? 0.15 : 0.08),
+            blurRadius: isCurrentCourse ? 16 : 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 4,
-                height: 20,
+          if (isCurrentCourse)
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: accentColor,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  subject,
+                child: const Text(
+                  'EN COURS',
                   style: TextStyle(
-                    fontFamily: 'Cabin',
-                    fontSize: 16,
+                    color: Colors.white,
+                    fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: accentColor,
+                    letterSpacing: 0.5,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            startTime.isNotEmpty && endTime.isNotEmpty
-                ? '$startTime à $endTime'
-                : 'Horaires non définis',
-            style: const TextStyle(
-              fontFamily: 'Cabin',
-              fontSize: 14,
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w500,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Salle $room - Prof. $teacher',
-            style: const TextStyle(
-              fontFamily: 'Cabin',
-              fontSize: 14,
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w500,
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        subject,
+                        style: TextStyle(
+                          fontFamily: 'Cabin',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1F2937),
+                          letterSpacing: -0.3,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: accentColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.schedule,
+                            size: 16,
+                            color: accentColor,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            startTime.isNotEmpty && endTime.isNotEmpty
+                                ? '$startTime - $endTime'
+                                : 'Horaires non définis',
+                            style: TextStyle(
+                              fontFamily: 'Cabin',
+                              fontSize: 14,
+                              color: accentColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 16,
+                            color: const Color(0xFF6B7280),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              'Salle $room',
+                              style: const TextStyle(
+                                fontFamily: 'Cabin',
+                                fontSize: 14,
+                                color: Color(0xFF6B7280),
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.person_outline,
+                            size: 16,
+                            color: const Color(0xFF6B7280),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              teacher,
+                              style: const TextStyle(
+                                fontFamily: 'Cabin',
+                                fontSize: 14,
+                                color: Color(0xFF6B7280),
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -387,7 +505,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -398,143 +516,209 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                // Header
-                Row(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
                   children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(
-                            color: const Color(0xFF4C51BF).withOpacity(0.2),
-                            width: 1,
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new,
+                              color: Color(0xFF1A202C),
+                              size: 20,
+                            ),
                           ),
                         ),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: Color(0xFF1A202C),
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 44),
-                        child: const Text(
-                          'Emploi du temps',
-                          style: TextStyle(
-                            fontFamily: 'Cabin',
-                            fontSize: 26,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A365D),
-                            letterSpacing: -0.5,
+                        Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 48),
+                            child: const Text(
+                              'Emploi du temps',
+                              style: TextStyle(
+                                fontFamily: 'Cabin',
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF1A365D),
+                                letterSpacing: -0.8,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30),
-
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: Offset(0, 10),
                         ),
                       ],
                     ),
-                    child: RefreshIndicator(
-                      onRefresh: fetchSchedule,
-                      child: Padding(
-                        padding: EdgeInsets.all(24.0),
-                        child: Column(
-                          children: [
-                            _buildDaySelector(),
-                            SizedBox(height: 24),
-                            if (isLocaleInitialized) Text(
-                              _formatSelectedDate(),
-                              style: TextStyle(
-                                fontFamily: 'Cabin',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1A365D),
-                              ),
-                            ),
-                            SizedBox(height: 24),
-                            Expanded(
-                              child: isLoading
-                                  ? Center(child: CircularProgressIndicator())
-                                  : error != null
-                                  ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      error!,
-                                      style: TextStyle(color: Colors.red),
-                                      textAlign: TextAlign.center,
+                  ],
+                ),
+              ),
+
+              // Main content
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 24,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: RefreshIndicator(
+                    onRefresh: fetchSchedule,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            children: [
+                              _buildDaySelector(),
+                              if (isLocaleInitialized) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF3F4F6),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    _formatSelectedDate(),
+                                    style: const TextStyle(
+                                      fontFamily: 'Cabin',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF374151),
                                     ),
-                                    SizedBox(height: 16),
-                                    ElevatedButton(
-                                      onPressed: fetchSchedule,
-                                      child: Text('Réessayer'),
-                                    ),
-                                  ],
-                                ),
-                              )
-                                  : scheduleData.isEmpty
-                                  ? Center(
-                                child: Text(
-                                  'Aucun cours prévu pour ce jour',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
                                   ),
                                 ),
-                              )
-                                  : ListView.builder(
-                                itemCount: scheduleData.length,
-                                itemBuilder: (context, index) {
-                                  final course = scheduleData[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 20),
-                                    child: _buildCourseCard(
-                                      course['matiere'],
-                                      course['plage_debut'],
-                                      course['plage_fin'],
-                                      course['salle'],
-                                      course['enseignant'],
-                                      Color(0xFF4C51BF),
+                                const SizedBox(height: 24),
+                              ],
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: isLoading
+                              ? const Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4338CA)),
+                            ),
+                          )
+                              : error != null
+                              ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    size: 64,
+                                    color: Colors.red.shade300,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    error!,
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  );
-                                },
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  ElevatedButton(
+                                    onPressed: fetchSchedule,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF4338CA),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Réessayer',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
+                          )
+                              : scheduleData.isEmpty
+                              ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.event_busy_outlined,
+                                  size: 80,
+                                  color: Colors.grey.shade300,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Aucun cours prévu',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Profitez de votre journée libre !',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                              : ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                            itemCount: scheduleData.length,
+                            itemBuilder: (context, index) {
+                              final course = scheduleData[index];
+                              final colorIndex = index % courseColors.length;
+                              return _buildCourseCard(
+                                course['matiere'],
+                                course['plage_debut'],
+                                course['plage_fin'],
+                                course['salle'],
+                                course['enseignant'],
+                                courseColors[colorIndex],
+                                index,
+                              );
+                            },
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

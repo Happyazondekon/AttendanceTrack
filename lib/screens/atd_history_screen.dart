@@ -112,8 +112,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
               }
 
               // Récupération des informations du cours et de l'UE
-
-              // On lit directement l'objet ue attaché à la présence
               final ue = attendance['ue'];
 
               return {
@@ -130,8 +128,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 'code_ue': ue?['code'] ?? 'N/A',
                 'valide': attendance['valide'] == 1,
               };
-
-
             }).where((attendance) {
               return attendance['date_presence'] == currentDateStr;
             }).toList();
@@ -157,7 +153,86 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
     }
   }
 
-  Widget _buildCourseCard(
+  Widget _buildDaySelector() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FF),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: weekDays.map((day) {
+          bool isSelected = day['date'].day == selectedDate.day &&
+              day['date'].month == selectedDate.month &&
+              day['date'].year == selectedDate.year;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedDate = day['date'];
+                });
+                fetchAttendance();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFF4338CA) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: isSelected ? [
+                    BoxShadow(
+                      color: const Color(0xFF4338CA).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ] : null,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      day['day'],
+                      style: TextStyle(
+                        fontFamily: 'Cabin',
+                        fontSize: 12,
+                        color: isSelected ? Colors.white : const Color(0xFF9CA3AF),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      day['dayNumber'].toString(),
+                      style: TextStyle(
+                        fontFamily: 'Cabin',
+                        fontSize: 16,
+                        color: isSelected ? Colors.white : const Color(0xFF374151),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  List<Color> get attendanceColors => [
+    const Color(0xFF4F46E5),
+    const Color(0xFF059669),
+    const Color(0xFFDC2626),
+    const Color(0xFF7C3AED),
+    const Color(0xFFEA580C),
+    const Color(0xFF0891B2),
+    const Color(0xFFBE185D),
+    const Color(0xFF65A30D),
+  ];
+
+  Widget _buildAttendanceCard(
       String matiere,
       String codeUe,
       String time,
@@ -165,13 +240,17 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
       bool isPresent,
       bool isValidated,
       Color accentColor,
+      int index,
       ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accentColor.withOpacity(0.2), width: 1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: accentColor.withOpacity(0.15),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: accentColor.withOpacity(0.08),
@@ -180,125 +259,166 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 4,
-                height: 20,
+          if (isValidated)
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: accentColor,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      matiere,
-                      style: TextStyle(
-                        fontFamily: 'Cabin',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: accentColor,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      codeUe,
-                      style: TextStyle(
-                        fontFamily: 'Cabin',
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isPresent ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                  color: Colors.blue,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      isPresent ? Icons.check_circle : Icons.cancel,
-                      color: isPresent ? Colors.green : Colors.red,
-                      size: 16,
+                    const Icon(
+                      Icons.verified,
+                      color: Colors.white,
+                      size: 12,
                     ),
-                    SizedBox(width: 4),
-                    Text(
-                      status.toUpperCase(),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'VALIDÉ',
                       style: TextStyle(
-                        color: isPresent ? Colors.green : Colors.red,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Heure : $time',
-                style: const TextStyle(
-                  fontFamily: 'Cabin',
-                  fontSize: 14,
-                  color: Color(0xFF6B7280),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              if (isValidated)
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.verified,
-                        color: Colors.blue,
-                        size: 14,
+            ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: BorderRadius.circular(3),
                       ),
-                      SizedBox(width: 4),
-                      Text(
-                        'Validé',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            matiere,
+                            style: const TextStyle(
+                              fontFamily: 'Cabin',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1F2937),
+                              letterSpacing: -0.3,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            codeUe,
+                            style: const TextStyle(
+                              fontFamily: 'Cabin',
+                              fontSize: 13,
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isPresent ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isPresent ? Icons.check_circle : Icons.cancel,
+                            color: isPresent ? Colors.green : Colors.red,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            status.toUpperCase(),
+                            style: TextStyle(
+                              color: isPresent ? Colors.green : Colors.red,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: accentColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.schedule,
+                            size: 16,
+                            color: accentColor,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Heure : $time',
+                            style: TextStyle(
+                              fontFamily: 'Cabin',
+                              fontSize: 14,
+                              color: accentColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
+  String _formatSelectedDate() {
+    if (!isLocaleInitialized) return '';
+    try {
+      return DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(selectedDate);
+    } catch (e) {
+      return DateFormat('yyyy-MM-dd').format(selectedDate);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -309,199 +429,210 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                Row(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
                   children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(
-                            color: const Color(0xFF4C51BF).withOpacity(0.2),
-                            width: 1,
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new,
+                              color: Color(0xFF1A202C),
+                              size: 20,
+                            ),
                           ),
                         ),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: Color(0xFF1A202C),
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 44),
-                        child: const Text(
-                          'Historique de Présences',
-                          style: TextStyle(
-                            fontFamily: 'Cabin',
-                            fontSize: 26,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A365D),
-                            letterSpacing: -0.5,
+                        Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 48),
+                            child: const Text(
+                              'Historique de Présences',
+                              style: TextStyle(
+                                fontFamily: 'Cabin',
+                                fontSize: 26,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF1A365D),
+                                letterSpacing: -0.8,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30),
-
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: Offset(0, 10),
                         ),
                       ],
                     ),
-                    child: RefreshIndicator(
-                      onRefresh: fetchAttendance,
-                      child: Padding(
-                        padding: EdgeInsets.all(24.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FF),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: weekDays.map((day) {
-                                  bool isSelected =
-                                      day['date'].day == selectedDate.day &&
-                                          day['date'].month == selectedDate.month &&
-                                          day['date'].year == selectedDate.year;
-                                  return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedDate = day['date'];
-                                      });
-                                      fetchAttendance();
-                                    },
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          day['day'],
-                                          style: TextStyle(
-                                            fontFamily: 'Cabin',
-                                            fontSize: 13,
-                                            color: isSelected ? Color(0xFF4338CA) : Color(0xFF9CA3AF),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        SizedBox(height: 8),
-                                        Container(
-                                          width: 32,
-                                          height: 32,
-                                          decoration: BoxDecoration(
-                                            color: isSelected ? Color(0xFF4338CA) : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              day['dayNumber'].toString(),
-                                              style: TextStyle(
-                                                fontFamily: 'Cabin',
-                                                fontSize: 15,
-                                                color: isSelected ? Colors.white : Color(0xFF374151),
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                  ],
+                ),
+              ),
+
+              // Main content
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 24,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: RefreshIndicator(
+                    onRefresh: fetchAttendance,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            children: [
+                              _buildDaySelector(),
+                              if (isLocaleInitialized) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF3F4F6),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    _formatSelectedDate(),
+                                    style: const TextStyle(
+                                      fontFamily: 'Cabin',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF374151),
                                     ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                            SizedBox(height: 24),
-                            if (isLocaleInitialized) Text(
-                              DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(selectedDate),
-                              style: TextStyle(
-                                fontFamily: 'Cabin',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1A365D),
-                              ),
-                            ),
-                            SizedBox(height: 24),
-                            Expanded(
-                              child: isLoading
-                                  ? Center(child: CircularProgressIndicator())
-                                  : error != null
-                                  ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      error!,
-                                      style: TextStyle(color: Colors.red),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    SizedBox(height: 16),
-                                    ElevatedButton(
-                                      onPressed: fetchAttendance,
-                                      child: Text('Réessayer'),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              )
-                                  : attendanceData.isEmpty
-                                  ? Center(
-                                child: Text(
+                                const SizedBox(height: 24),
+                              ],
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: isLoading
+                              ? const Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4338CA)),
+                            ),
+                          )
+                              : error != null
+                              ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    size: 64,
+                                    color: Colors.red.shade300,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    error!,
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  ElevatedButton(
+                                    onPressed: fetchAttendance,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF4338CA),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Réessayer',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                              : attendanceData.isEmpty
+                              ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.assignment_outlined,
+                                  size: 80,
+                                  color: Colors.grey.shade300,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Aucune présence enregistrée',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
                                   'Aucun cours ce jour',
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: Colors.grey,
+                                    color: Colors.grey.shade500,
                                   ),
                                 ),
-                              )
-                                  : ListView.builder(
-                                itemCount: attendanceData.length,
-                                itemBuilder: (context, index) {
-                                  final attendance = attendanceData[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 20),
-                                    child: _buildCourseCard(
-                                      attendance['matiere'],
-                                      attendance['code_ue'],
-                                      attendance['heure'],
-                                      attendance['status'],
-                                      attendance['present'],
-                                      attendance['valide'],
-                                      Color(0xFF4C51BF),
-                                    ),
-                                  );
-                                },
-                              ),
+                              ],
                             ),
-                          ],
+                          )
+                              : ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                            itemCount: attendanceData.length,
+                            itemBuilder: (context, index) {
+                              final attendance = attendanceData[index];
+                              final colorIndex = index % attendanceColors.length;
+                              return _buildAttendanceCard(
+                                attendance['matiere'],
+                                attendance['code_ue'],
+                                attendance['heure'],
+                                attendance['status'],
+                                attendance['present'],
+                                attendance['valide'],
+                                attendanceColors[colorIndex],
+                                index,
+                              );
+                            },
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

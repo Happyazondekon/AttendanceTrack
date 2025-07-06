@@ -1,8 +1,6 @@
-import 'package:eneam/screens/atd_fail_screen.dart';
 import 'package:eneam/screens/login_screen.dart';
-import 'package:eneam/screens/register_screen.dart';
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart'; // Import de l'écran d'accueil
+
 
 void main() {
   runApp(const MyApp());
@@ -15,19 +13,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'App Présence',
+      title: 'Système de Suivi des Présences avec QR Code et géolocalisation',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4C51BF)),
         useMaterial3: true,
-        fontFamily: 'Cabin', // Police personnalisée
+        fontFamily: 'Cabin',
       ),
-      home: const AppLauncher(),
-      debugShowCheckedModeBanner: false, // Suppression du bandeau "Debug"
+      home: const LoginScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class AppLauncher extends StatelessWidget {
+/*class AppLauncher extends StatelessWidget {
   const AppLauncher({super.key});
 
   @override
@@ -182,7 +180,7 @@ class AppLauncher extends StatelessWidget {
       ),
     );
   }
-}
+}*/
 
 
 

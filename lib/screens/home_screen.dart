@@ -3,6 +3,7 @@ import 'package:eneam/screens/profile_screen.dart';
 import 'package:eneam/screens/scanqrcode_screen.dart';
 import 'package:eneam/screens/timetable_screen.dart';
 import 'package:eneam/screens/senator_home_screen.dart';
+import 'package:lottie/lottie.dart';
 
 import 'package:flutter/material.dart';
 
@@ -30,200 +31,299 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 50),
-              // Header avec profil
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Bonjour $nom',  // Affichage dynamique
-                    style: const TextStyle(
-                      fontFamily: 'Cabin',
-                      fontSize: 25,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2D3748),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                // Header avec profil modernisé
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Bonjour,',
+                            style: TextStyle(
+                              fontFamily: 'Cabin',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF2D3748).withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            nom.isNotEmpty ? nom : 'Utilisateur',
+                            style: const TextStyle(
+                              fontFamily: 'Cabin',
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2D3748),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ProfileScreen()),
-                      );
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        border: Border.all(
-                          color: const Color(0xFF4C51BF),
-                          width: 2,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ProfileScreen()),
+                        );
+                      },
+                      child: Container(
+                        width: 55,
+                        height: 55,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF4C51BF),
+                              Color(0xFF0D147F),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(27.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF4C51BF).withOpacity(0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 26,
                         ),
                       ),
-                      child: const Icon(
-                        Icons.person,
-                        color: Color(0xFF4C51BF),
-                        size: 24,
-                      ),
                     ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-
-              // Image centrale depuis assets
-              SizedBox(
-                height: 250,
-                child: Image.asset(
-                  'assets/home.png',
-                  fit: BoxFit.contain,
+                  ],
                 ),
-              ),
 
-              const SizedBox(height: 30),
+                const SizedBox(height: 40),
 
-              // Boutons de navigation
-              Column(
-                children: [
-                  // Historiques de Présences
-                  _buildMenuButton(
-                    context,
-                    icon: Icons.history,
-                    title: 'Historiques de Présences',
-                    onTap: () {
-                      Navigator.push(
+                // Image centrale avec conteneur décoré
+                Container(
+                  height: 220,
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Lottie.asset(
+                      'assets/presence.json',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Section Menu avec titre
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Menu Principal',
+                    style: TextStyle(
+                      fontFamily: 'Cabin',
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Boutons de navigation modernisés
+                Expanded(
+                  child: ListView(
+                    children: [
+                      _buildModernMenuButton(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => AttendanceHistoryScreen(),
+                        icon: Icons.history,
+                        title: 'Historique de Présences',
+                        subtitle: 'Consultez vos présences passées',
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                         ),
-                      );
-                    },
-                  ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AttendanceHistoryScreen(),
+                            ),
+                          );
+                        },
+                      ),
 
-                  const SizedBox(height: 20),
+                      const SizedBox(height: 15),
 
-                  // Mon Emploi du Temps
-                  _buildMenuButton(
-                    context,
-                    icon: Icons.schedule,
-                    title: 'Mon Emploi du Temps',
-                    onTap: () {
-                      Navigator.push(
+                      _buildModernMenuButton(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => EmploiDuTempsScreen(),
+                        icon: Icons.schedule,
+                        title: 'Mon Emploi du Temps',
+                        subtitle: 'Visualisez votre planning',
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
                         ),
-                      );
-                    },
-                  ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EmploiDuTempsScreen(),
+                            ),
+                          );
+                        },
+                      ),
 
-                  const SizedBox(height: 20),
+                      const SizedBox(height: 15),
 
-                  // Scanner pour valider
-                  _buildMenuButton(
-                    context,
-                    icon: Icons.qr_code_scanner,
-                    title: 'Scanner pour valider',
-                    onTap: () {
-                      Navigator.push(
+                      _buildModernMenuButton(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => ScanQRCodeScreen(),
+                        icon: Icons.qr_code_scanner,
+                        title: 'Scanner pour valider',
+                        subtitle: 'Scannez un QR code pour marquer votre présence',
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFA709A), Color(0xFFFEE140)],
                         ),
-                      );
-                    },
-                  ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ScanQRCodeScreen(),
+                            ),
+                          );
+                        },
+                      ),
 
-                  const SizedBox(height: 20),
+                      const SizedBox(height: 15),
 
-                  // Je suis un Sénateur (conditionnel)
-                  _buildMenuButton(
-                    context,
-                    icon: Icons.person_add,
-                    title: 'Je suis un Sénateur',
-                    isEnabled: isSenator,
-                    onTap: isSenator
-                        ? () {
-                      Navigator.push(
+                      _buildModernMenuButton(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const SenateurScreen()),
-                      );
-                    }
-                        : null,
+                        icon: Icons.person_add,
+                        title: 'Je suis un Sénateur',
+                        subtitle: isSenator
+                            ? 'Accédez à vos fonctions de sénateur'
+                            : 'Fonction non disponible',
+                        gradient: isSenator
+                            ? const LinearGradient(
+                          colors: [Color(0xFFFF9A9E), Color(0xFFFECFEF)],
+                        )
+                            : LinearGradient(
+                          colors: [
+                            Colors.grey.shade400,
+                            Colors.grey.shade600,
+                          ],
+                        ),
+                        isEnabled: isSenator,
+                        onTap: isSenator
+                            ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SenateurScreen(),
+                            ),
+                          );
+                        }
+                            : null,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMenuButton(
+  Widget _buildModernMenuButton(
       BuildContext context, {
         required IconData icon,
         required String title,
+        required String subtitle,
+        required Gradient gradient,
         required VoidCallback? onTap,
         bool isEnabled = true,
       }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: isEnabled ? onTap : null,
       child: Container(
-        width: double.infinity,
-        height: 70,
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isEnabled ? const Color(0xFF4C51BF) : const Color(0xFF9CA3AF),
-          borderRadius: BorderRadius.circular(35),
+          gradient: isEnabled ? gradient : null,
+          color: !isEnabled ? Colors.grey.shade400 : null,
+          borderRadius: BorderRadius.circular(20),
           boxShadow: isEnabled
               ? [
             BoxShadow(
-              color: const Color(0xFF4C51BF).withOpacity(0.3),
+              color: Colors.black.withOpacity(0.1),
               blurRadius: 10,
-              offset: const Offset(0, 4),
+              offset: const Offset(0, 5),
             ),
           ]
-              : null,
+              : [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 22,
-                ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(25),
               ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Cabin',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: isEnabled ? Colors.white : Colors.white.withOpacity(0.7),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Cabin',
+                      color: isEnabled ? Colors.white : Colors.white.withOpacity(0.7),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontFamily: 'Cabin',
+                      color: isEnabled
+                          ? Colors.white.withOpacity(0.8)
+                          : Colors.white.withOpacity(0.5),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: isEnabled
+                  ? Colors.white.withOpacity(0.7)
+                  : Colors.white.withOpacity(0.4),
+              size: 16,
+            ),
+          ],
         ),
       ),
     );

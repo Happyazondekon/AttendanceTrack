@@ -41,7 +41,6 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Container(
@@ -50,121 +49,253 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFE6E6FA),
-              Color(0xFF4C51BF),
+              Color(0xFFFFFFFF), // Blanc en haut
+              Color(0xFF0D147F), // Bleu foncé en bas
             ],
-            stops: [0.3, 1.0],
           ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // Header
+                // Header modernisé
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(
-                            color: const Color(0xFF4C51BF).withOpacity(0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: Color(0xFF1A202C),
-                          size: 22,
-                        ),
+                    _buildHeaderButton(
+                      icon: Icons.arrow_back,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    const Text(
+                      'Scanner QR Code',
+                      style: TextStyle(
+                        fontFamily: 'Cabin',
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF2D3748),
                       ),
                     ),
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 44),
-                        child: const Text(
-                          'Scanner QR Code',
-                          style: TextStyle(
-                            fontFamily: 'Cabin',
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A365D),
-                            letterSpacing: -0.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
+                    const SizedBox(width: 45), // Équilibrer l'espace
                   ],
                 ),
 
-                SizedBox(height: screenHeight * 0.08),
+                const SizedBox(height: 40),
 
-                // Zone de scan ou illustration
+                // Zone de scan principale
                 Expanded(
                   flex: 3,
-                  child: isScanning && cameraController != null
-                      ? ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: MobileScanner(
-                      controller: cameraController!,
-                      onDetect: (capture) {
-                        final List<Barcode> barcodes = capture.barcodes;
-                        if (barcodes.isNotEmpty) {
-                          final String? code = barcodes.first.rawValue;
-                          if (code != null) {
-                            _stopScanning();
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PresenceValidationScreen(qrCode: code),
-                              ),
-                            ).then((_) {
-                              if (mounted) {
-                                _startScanning();
-                              }
-                            });
-                          }
-                        }
-                      },
-                    ),
-                  )
-                      : Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: screenHeight * 0.4,
-                          child: Image.asset(
-                            'assets/scan.png',
-                            fit: BoxFit.contain,
-                          ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
                         ),
                       ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: isScanning && cameraController != null
+                          ? Stack(
+                        children: [
+                          MobileScanner(
+                            controller: cameraController!,
+                            onDetect: (capture) {
+                              final List<Barcode> barcodes = capture.barcodes;
+                              if (barcodes.isNotEmpty) {
+                                final String? code = barcodes.first.rawValue;
+                                if (code != null) {
+                                  _stopScanning();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PresenceValidationScreen(qrCode: code),
+                                    ),
+                                  ).then((_) {
+                                    if (mounted) {
+                                      _startScanning();
+                                    }
+                                  });
+                                }
+                              }
+                            },
+                          ),
+                          // Overlay de scan avec animation
+                          Center(
+                            child: Container(
+                              width: 250,
+                              height: 250,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 3,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Stack(
+                                children: [
+                                  // Coins du cadre
+                                  Positioned(
+                                    top: 0,
+                                    left: 0,
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.only(
+                                          bottomRight: Radius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                          : Padding(
+                        padding: const EdgeInsets.all(30.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF4C51BF), Color(0xFF0D147F)],
+                                ),
+                                borderRadius: BorderRadius.circular(60),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF4C51BF).withOpacity(0.3),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.qr_code_scanner,
+                                size: 60,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            const Text(
+                              'Prêt à scanner',
+                              style: TextStyle(
+                                fontFamily: 'Cabin',
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF2D3748),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Appuyez sur le bouton pour commencer le scan',
+                              style: TextStyle(
+                                fontFamily: 'Cabin',
+                                fontSize: 14,
+                                color: Colors.grey.shade600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
 
+                const SizedBox(height: 30),
+
+                // Section boutons
+                if (!isScanning) ...[
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Actions',
+                      style: TextStyle(
+                        fontFamily: 'Cabin',
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                ],
+
                 // Boutons d'action
                 Expanded(
                   flex: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: ListView(
                     children: [
-                      // Bouton Scanner
-                      _buildActionButton(
+                      // Bouton Scanner principal
+                      _buildModernActionButton(
                         context,
                         icon: isScanning ? Icons.stop : Icons.qr_code_scanner,
-                        title: isScanning ? 'Arrêter le scan' : 'Scanner un QR Code',
-                        isPrimary: true,
+                        title: isScanning ? 'Arrêter le scan' : 'Commencer le scan',
+                        subtitle: isScanning
+                            ? 'Touchez pour arrêter'
+                            : 'Scannez un QR code pour marquer votre présence',
+                        gradient: isScanning
+                            ? const LinearGradient(
+                          colors: [Color(0xFFFF6B6B), Color(0xFFFF8E8E)],
+                        )
+                            : const LinearGradient(
+                          colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
+                        ),
                         onTap: () {
                           if (isScanning) {
                             _stopScanning();
@@ -174,15 +305,17 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 16),
-
-                      // Autres boutons
                       if (!isScanning) ...[
-                        _buildActionButton(
+                        const SizedBox(height: 15),
+
+                        _buildModernActionButton(
                           context,
                           icon: Icons.history,
-                          title: 'Historiques de Présences',
-                          isPrimary: false,
+                          title: 'Historique de Présences',
+                          subtitle: 'Consultez vos présences passées',
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          ),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -193,13 +326,16 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                           },
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 15),
 
-                        _buildActionButton(
+                        _buildModernActionButton(
                           context,
                           icon: Icons.home,
-                          title: 'Retourner à l\'accueil',
-                          isPrimary: false,
+                          title: 'Retour à l\'accueil',
+                          subtitle: 'Retournez au menu principal',
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFFA709A), Color(0xFFFEE140)],
+                          ),
                           onTap: () {
                             Navigator.pop(context);
                           },
@@ -208,8 +344,6 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -217,63 +351,110 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
       ),
     );
   }
-  Widget _buildActionButton(
+
+  Widget _buildHeaderButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 45,
+        height: 45,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(22.5),
+          border: Border.all(
+            color: const Color(0xFF4C51BF).withOpacity(0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: const Color(0xFF2D3748),
+          size: 22,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernActionButton(
       BuildContext context, {
         required IconData icon,
         required String title,
-        required bool isPrimary,
+        required String subtitle,
+        required Gradient gradient,
         required VoidCallback onTap,
       }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
-        height: 64,
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isPrimary
-              ? const Color(0xFF4C51BF)
-              : const Color(0xFF4C51BF).withOpacity(0.85),
-          borderRadius: BorderRadius.circular(32),
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4C51BF).withOpacity(0.25),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 22,
-                ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(25),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontFamily: 'Cabin',
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    letterSpacing: -0.2,
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontFamily: 'Cabin',
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontFamily: 'Cabin',
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white.withOpacity(0.7),
+              size: 16,
+            ),
+          ],
         ),
       ),
     );
