@@ -4,7 +4,7 @@ import 'package:eneam/screens/scanqrcode_screen.dart';
 import 'package:eneam/screens/timetable_screen.dart';
 import 'package:eneam/screens/senator_home_screen.dart';
 import 'package:lottie/lottie.dart';
-
+import 'package:eneam/screens/faq_chatbot.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -20,6 +20,13 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showFAQChatBot(context),
+        backgroundColor: const Color(0xFF0D147F),
+        child: const Icon(Icons.chat, color: Colors.white),
+        tooltip: 'Assistant FAQ',
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
