@@ -119,23 +119,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         );
 
         if (response.statusCode == 200 && response.data['success'] == true) {
-          // Masquer partiellement l'email
           final email = response.data['email'] as String;
           final atIndex = email.indexOf('@');
-          if (atIndex > 3) {
-            final maskedEmail = email.substring(0, 3) +
-                '*' * (atIndex - 3) +
-                email.substring(atIndex);
-            setState(() {
-              _codeSent = true;
-              _userEmail = maskedEmail;
-            });
-          } else {
-            setState(() {
-              _codeSent = true;
-              _userEmail = email;
-            });
-          }
+          final maskedEmail = atIndex > 3
+              ? email.substring(0, 3) + '*' * (atIndex - 3) + email.substring(atIndex)
+              : email;
+
+          setState(() {
+            _codeSent = true;
+            _userEmail = maskedEmail;
+          });
           _startCountdown();
         } else {
           _shakeController.forward().then((_) => _shakeController.reverse());
@@ -223,7 +216,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       }
     }
   }
-
 
   Widget _buildGlassmorphicContainer({required Widget child}) {
     return Container(
@@ -340,7 +332,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     width: 2,
                   ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
               ),
               validator: validator,
             ),
@@ -417,7 +412,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -490,6 +484,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               ),
                             ),
                             const SizedBox(height: 40),
+
                             if (_codeSent) ...[
                               Container(
                                 padding: const EdgeInsets.symmetric(
@@ -558,7 +553,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               label: 'Matricule',
                               hint: 'Entrez votre matricule',
                               prefixIcon: Icons.badge_outlined,
-                              enabled: !_isLoading,
+                              enabled: !_isLoading && !_codeSent, // Désactivé quand le code est envoyé
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Veuillez entrer votre matricule';
@@ -567,6 +562,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               },
                             ),
                             const SizedBox(height: 24),
+
                             if (_codeSent)
                               _buildModernTextField(
                                 controller: _codeController,
