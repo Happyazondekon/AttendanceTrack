@@ -1,3 +1,5 @@
+import 'package:eneam/screens/atd_submit_screen.dart';
+import 'package:eneam/screens/atd_submit_screen.dart';
 import 'package:eneam/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:eneam/services/user_manager.dart';
@@ -32,6 +34,8 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+//Pour montrer la validatio de presence sans token
+//const PresenceValidationScreen(qrCode: 'session_6867b7112e3bf',),
 
 /*class AppLauncher extends StatelessWidget {
   const AppLauncher({super.key});
