@@ -167,9 +167,9 @@ class _SenateurScreenState extends State<SenateurScreen> with TickerProviderStat
     position: _offsetAnimation2,
     child: _ActionCard(
     title: 'Historiques',
-    description: 'Visualiser lhistorique\nConsultez les cours déjà enregistrés',
-    buttonText: 'Consultez lhistorique',
-    iconPath: 'assets/historique.png',
+      description: 'Visualiser l\'historique\nConsultez les cours déjà enregistrés',
+      buttonText: 'Consultez l\'historique',
+      iconPath: 'assets/historique.png',
     color: const Color(0xFF0F1F84),
     isDark: true,
     onTap: () {
@@ -204,7 +204,7 @@ class _SenateurScreenState extends State<SenateurScreen> with TickerProviderStat
     description: 'Gérer les statuts des cours\nConfirmer ou annuler les cours prévus',
     buttonText: 'Gérer les statuts',
     icon: Icons.event_available,
-    color: const Color(0xFFFFC107),
+    color: const Color(0xFFB3DEFF),
     onTap: () {
     Navigator.push(
     context,
