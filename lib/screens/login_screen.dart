@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       try {
         final response = await dio.post(
-          'http://10.0.2.2:8000/auth/send-code',
+          'https://eneam2025.onrender.com/auth/send-code',
           data: {'matricule': _matriculeController.text},
           options: Options(
             headers: {'Content-Type': 'application/json'},
@@ -159,13 +159,15 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     }
   }
 
+  // Dans votre méthode _verifyCode, remplacez cette partie :
+
   Future<void> _verifyCode() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
       try {
         final response = await dio.post(
-          'http://10.0.2.2:8000/auth/verify-code',
+          'https://eneam2025.onrender.com/auth/verify-code',
           data: {'code': _codeController.text},
           options: Options(
             headers: {'Content-Type': 'application/json'},
@@ -175,7 +177,32 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         if (response.statusCode == 200 && response.data['success'] == true) {
           final nom = response.data['data']['nom'] ?? 'Utilisateur';
           final userData = response.data['data'];
-          await UserManager().setUser(User.fromJson(userData));
+
+          // CORRECTION: Récupérer le token depuis les cookies
+          String? token;
+          final cookies = await cookieJar.loadForRequest(Uri.parse('https://eneam2025.onrender.com'));
+          for (var cookie in cookies) {
+            if (cookie.name == 'authToken' || cookie.name == 'token') {
+              token = cookie.value;
+              break;
+            }
+          }
+
+          // Si le token n'est pas dans les cookies, vérifiez s'il est dans la réponse
+          if (token == null) {
+            token = response.data['token'] ?? response.data['data']['token'];
+          }
+
+          print('Token récupéré lors de la connexion: $token');
+
+          // Créer l'utilisateur avec le token
+          final user = User.fromJson({
+            ...userData,
+            'token': token, // Ajouter le token aux données utilisateur
+          });
+
+          // Sauvegarder l'utilisateur avec le token
+          await UserManager().setUser(user);
 
           if (mounted) {
             Navigator.pushReplacement(
@@ -201,6 +228,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           );
         }
       } catch (e) {
+        print('Erreur lors de la vérification du code: $e');
         _shakeController.forward().then((_) => _shakeController.reverse());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

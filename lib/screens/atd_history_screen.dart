@@ -86,7 +86,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/api/suivi-presence/presences/etudiant/${user.id}'),
+        Uri.parse('https://eneam2025.onrender.com/api/suivi-presence/presences/etudiant/${user.id}'),
         headers: {
           'Accept': 'application/json',
         },

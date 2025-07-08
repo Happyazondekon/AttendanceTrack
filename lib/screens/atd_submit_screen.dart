@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../services/token_service.dart';
+import '../services/user_manager.dart';
 
 class PresenceValidationScreen extends StatefulWidget {
   final String qrCode;
@@ -18,6 +19,8 @@ class PresenceValidationScreen extends StatefulWidget {
 
 class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
   bool isSubmitting = false;
+
+  // Améliorez la méthode atdSubmit avec un meilleur débogage :
 
   Future<void> atdSubmit() async {
     setState(() => isSubmitting = true);
@@ -38,68 +41,126 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
       // Obtenir la position actuelle
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-      // Récupérer le token de l'utilisateur
-      final token = await TokenService().getToken();
-      if (token == null) throw Exception("Token utilisateur non disponible.");
+      // Récupérer le token avec débogage amélioré
+      print('=== DEBUT DEBUG TOKEN ===');
+      final userManager = UserManager();
 
-      // Envoyer la requête
+      await userManager.loadUser();
+      final user = userManager.user;
+
+      print('User existe: ${user != null}');
+      if (user != null) {
+        print('User ID: ${user.id}');
+        print('User nom: ${user.nom}');
+        print('User email: ${user.email}');
+        print('Token existe: ${user.token != null}');
+        print('Token complet: ${user.token}');
+        print('Token length: ${user.token?.length}');
+      }
+
+      final rawToken = await TokenService().getToken();
+      final token = rawToken?.split('|').last; // <- correction ici
+
+      print('Token sans prefixe: $token');
+      print('UserManager isLoggedIn: ${userManager.isLoggedIn}');
+      print('=== FIN DEBUG TOKEN ===');
+
+      if (token == null || token.isEmpty) {
+        throw Exception("Token utilisateur non disponible. Veuillez vous reconnecter.");
+      }
+
+      // Préparer les données
+      final requestData = {
+        'qr_code': widget.qrCode,
+        'latitude': position.latitude.toString(),
+        'longitude': position.longitude.toString(),
+      };
+
+      print('=== DEBUT DEBUG REQUETE ===');
+      print('URL: https://eneam2025.onrender.com/api/valider');
+      print('Headers: Authorization: Bearer $token');
+      print('Data: $requestData');
+      print('=== FIN DEBUG REQUETE ===');
+
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/api/valider'),
+        Uri.parse('https://eneam2025.onrender.com/api/valider'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
         },
-        body: {
-          'qr_code': widget.qrCode,
-          'latitude': position.latitude.toString(),
-          'longitude': position.longitude.toString(),
-        },
+        body: json.encode(requestData),
       );
+
+      print('=== DEBUT DEBUG REPONSE ===');
+      print('Response status: ${response.statusCode}');
+      print('Response headers: ${response.headers}');
+      print('Response body: ${response.body}');
+      print('=== FIN DEBUG REPONSE ===');
 
       final data = json.decode(response.body);
 
       if (response.statusCode == 200 && data['success'] == true) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                "Présence validée avec succès.",
+                style: TextStyle(
+                  fontFamily: 'Cabin',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } else {
+        if (response.statusCode == 401) {
+          throw Exception("Token expiré. Veuillez vous reconnecter.");
+        } else if (response.statusCode == 403) {
+          throw Exception("Accès refusé. Vérifiez vos permissions.");
+        } else {
+          throw Exception(data['message'] ?? "Échec de la validation. Code: ${response.statusCode}");
+        }
+      }
+    } catch (e) {
+      print('=== ERREUR COMPLETE ===');
+      print('Type d\'erreur: ${e.runtimeType}');
+      print('Message d\'erreur: $e');
+      print('Stack trace: ${StackTrace.current}');
+      print('=== FIN ERREUR ===');
+
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              "Présence validée avec succès.",
-              style: TextStyle(
+            content: Text(
+              "Erreur : ${e.toString()}",
+              style: const TextStyle(
                 fontFamily: 'Cabin',
                 fontWeight: FontWeight.w600,
               ),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
           ),
         );
-        Navigator.pop(context); // Retour automatique
-      } else {
-        throw Exception(data['message'] ?? "Échec de la validation.");
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Erreur : ${e.toString()}",
-            style: const TextStyle(
-              fontFamily: 'Cabin',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-      );
     } finally {
-      setState(() => isSubmitting = false);
+      if (mounted) {
+        setState(() => isSubmitting = false);
+      }
     }
   }
+
 
   void _showValidationDialog() {
     showDialog(

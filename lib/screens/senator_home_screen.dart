@@ -104,17 +104,10 @@ class _SenateurScreenState extends State<SenateurScreen> with TickerProviderStat
         ],
       ),
       const SizedBox(height: 22),
-      const Text(
-        "Salut, Jordy",
-        style: TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
+
       const SizedBox(height: 12),
       const Text(
-          'Cette section est réservée uniquement aux sénateurs de la classe "IG 2/B", ici vous êtes amenés à remplir le cahier des textes et visualiser',
+          'Cette section est réservée uniquement aux sénateurs, ici vous êtes amenés à remplir le cahier des textes et visualiser',
           style: TextStyle(fontSize: 14, color: Colors.white),
     ),
     const SizedBox(height: 30),
