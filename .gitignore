@@ -32,7 +32,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-
+/lib/screens/faq_chatbot.dart
 # Symbolication related
 app.*.symbols
 

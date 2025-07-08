@@ -23,7 +23,7 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => showFAQChatBot(context),
         backgroundColor: const Color(0xFF0D147F),
-        child: const Icon(Icons.chat, color: Colors.white),
+        child: const Icon(Icons.smart_toy, color: Colors.white),
         tooltip: 'Assistant FAQ',
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
