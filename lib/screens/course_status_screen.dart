@@ -140,7 +140,7 @@ class _CourseStatusScreenState extends State<CourseStatusScreen> {
   Future<void> updateCourseStatus(int programmationId, String newStatus, {String? commentaire}) async {
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:8000/api/etat-cours'),
+        Uri.parse('https://eneam2025.onrender.com/api/etat-cours'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ class _CourseStatusScreenState extends State<CourseStatusScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/api/gestioncontrat/programmation/show'),
+        Uri.parse('https://eneam2025.onrender.com/api/gestioncontrat/programmation/show'),
         headers: {
           'Accept': 'application/json',
         },

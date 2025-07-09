@@ -20,8 +20,6 @@ class PresenceValidationScreen extends StatefulWidget {
 class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
   bool isSubmitting = false;
 
-  // Améliorez la méthode atdSubmit avec un meilleur débogage :
-
   Future<void> atdSubmit() async {
     setState(() => isSubmitting = true);
 
@@ -44,7 +42,6 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
       // Récupérer le token avec débogage amélioré
       print('=== DEBUT DEBUG TOKEN ===');
       final userManager = UserManager();
-
       await userManager.loadUser();
       final user = userManager.user;
 
@@ -59,9 +56,16 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
       }
 
       final rawToken = await TokenService().getToken();
-      final token = rawToken?.split('|').last; // <- correction ici
+      // CORRECTION 1: Vérifier si le token contient "|" avant de le diviser
+      String? token;
+      if (rawToken != null && rawToken.contains('|')) {
+        token = rawToken.split('|').last;
+        print('Token avec préfixe détecté, token extrait: $token');
+      } else {
+        token = rawToken;
+        print('Token sans préfixe: $token');
+      }
 
-      print('Token sans prefixe: $token');
       print('UserManager isLoggedIn: ${userManager.isLoggedIn}');
       print('=== FIN DEBUG TOKEN ===');
 
@@ -69,27 +73,36 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
         throw Exception("Token utilisateur non disponible. Veuillez vous reconnecter.");
       }
 
-      // Préparer les données
+      // CORRECTION 2: Convertir les coordonnées en string avec plus de précision
       final requestData = {
         'qr_code': widget.qrCode,
-        'latitude': position.latitude.toString(),
-        'longitude': position.longitude.toString(),
+        'latitude': position.latitude.toStringAsFixed(6), // Plus de précision
+        'longitude': position.longitude.toStringAsFixed(6), // Plus de précision
       };
 
       print('=== DEBUT DEBUG REQUETE ===');
       print('URL: https://eneam2025.onrender.com/api/valider');
       print('Headers: Authorization: Bearer $token');
       print('Data: $requestData');
+      print('Position exacte: ${position.latitude}, ${position.longitude}');
+      print('Précision: ${position.accuracy}');
       print('=== FIN DEBUG REQUETE ===');
 
+      // CORRECTION 3: Ajouter un timeout et améliorer les headers
       final response = await http.post(
         Uri.parse('https://eneam2025.onrender.com/api/valider'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
+          'User-Agent': 'Flutter-App/1.0', // Ajouter User-Agent
         },
         body: json.encode(requestData),
+      ).timeout(
+        const Duration(seconds: 30), // Timeout de 30 secondes
+        onTimeout: () {
+          throw Exception('Timeout: La requête a pris trop de temps');
+        },
       );
 
       print('=== DEBUT DEBUG REPONSE ===');
@@ -97,6 +110,11 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
       print('Response headers: ${response.headers}');
       print('Response body: ${response.body}');
       print('=== FIN DEBUG REPONSE ===');
+
+      // CORRECTION 4: Améliorer la gestion des réponses
+      if (response.body.isEmpty) {
+        throw Exception('Réponse vide du serveur');
+      }
 
       final data = json.decode(response.body);
 
@@ -121,13 +139,21 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
           Navigator.pop(context);
         }
       } else {
+        // CORRECTION 5: Améliorer la gestion des erreurs spécifiques
+        String errorMessage;
         if (response.statusCode == 401) {
-          throw Exception("Token expiré. Veuillez vous reconnecter.");
+          errorMessage = "Token expiré. Veuillez vous reconnecter.";
         } else if (response.statusCode == 403) {
-          throw Exception("Accès refusé. Vérifiez vos permissions.");
+          // Erreur spécifique pour les permissions/localisation
+          errorMessage = data['message'] ?? "Accès refusé. Vérifiez votre localisation ou vos permissions.";
+        } else if (response.statusCode == 422) {
+          errorMessage = data['message'] ?? "Données invalides.";
+        } else if (response.statusCode == 409) {
+          errorMessage = data['message'] ?? "Présence déjà validée.";
         } else {
-          throw Exception(data['message'] ?? "Échec de la validation. Code: ${response.statusCode}");
+          errorMessage = data['message'] ?? "Échec de la validation. Code: ${response.statusCode}";
         }
+        throw Exception(errorMessage);
       }
     } catch (e) {
       print('=== ERREUR COMPLETE ===');
@@ -161,6 +187,67 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
     }
   }
 
+  // CORRECTION 6: Méthode pour tester la connectivité
+  Future<bool> testConnectivity() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://eneam2025.onrender.com/api/test'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Test connectivité échoué: $e');
+      return false;
+    }
+  }
+
+  // CORRECTION 7: Méthode pour vérifier les permissions avant validation
+  Future<bool> checkAllPermissions() async {
+    // Vérifier service de localisation
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Veuillez activer le service de localisation'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return false;
+    }
+
+    // Vérifier permissions
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Permission de localisation refusée'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Permission de localisation refusée définitivement. Veuillez l\'activer dans les paramètres.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return false;
+    }
+
+    return true;
+  }
 
   void _showValidationDialog() {
     showDialog(
@@ -281,9 +368,12 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: isSubmitting ? null : () {
+                  onPressed: isSubmitting ? null : () async {
                     Navigator.pop(context);
-                    atdSubmit();
+                    // CORRECTION 8: Vérifier les permissions avant de soumettre
+                    if (await checkAllPermissions()) {
+                      atdSubmit();
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4C51BF),
