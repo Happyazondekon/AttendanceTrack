@@ -49,8 +49,8 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFFFFFFF), // Blanc en haut
-              Color(0xFF0D147F), // Bleu foncé en bas
+              Color(0xFFE6E6FA), // Blanc en haut
+              Color(0xFFE6E6FA), // Bleu foncé en bas
             ],
           ),
         ),
@@ -148,7 +148,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                                       width: 30,
                                       height: 30,
                                       decoration: const BoxDecoration(
-                                        color: Colors.white,
+                                        color: Color(0xFF0D147F),
                                         borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(20),
                                         ),
@@ -162,7 +162,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                                       width: 30,
                                       height: 30,
                                       decoration: const BoxDecoration(
-                                        color: Colors.white,
+                                        color: Color(0xFF0D147F),
                                         borderRadius: BorderRadius.only(
                                           topRight: Radius.circular(20),
                                         ),
@@ -267,7 +267,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                       'Actions',
                       style: TextStyle(
                         fontFamily: 'Cabin',
-                        color: Colors.white,
+                        color: Color(0xFF0D147F),
                         fontWeight: FontWeight.bold,
                         fontSize: 22,
                       ),
@@ -291,10 +291,10 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                             : 'Scannez un QR code pour marquer votre présence',
                         gradient: isScanning
                             ? const LinearGradient(
-                          colors: [Color(0xFFFF6B6B), Color(0xFFFF8E8E)],
+                          colors: [Color(0xFF0D147F), Color(0xFF0D147F)],
                         )
                             : const LinearGradient(
-                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          colors: [Color(0xFF0D147F), Color(0xFF0D147F)],
                         ),
                         onTap: () {
                           if (isScanning) {
@@ -314,7 +314,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                           title: 'Historique de Présences',
                           subtitle: 'Consultez vos présences passées',
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
+                            colors: [Color(0xFF0D147F), Color(0xFF0D147F)],
                           ),
                           onTap: () {
                             Navigator.push(
@@ -334,7 +334,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                           title: 'Retour à l\'accueil',
                           subtitle: 'Retournez au menu principal',
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                            colors: [Color(0xFF0D147F), Color(0xFF0D147F)],
                           ),
                           onTap: () {
                             Navigator.pop(context);

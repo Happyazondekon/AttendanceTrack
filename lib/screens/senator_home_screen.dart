@@ -61,7 +61,7 @@ class _SenateurScreenState extends State<SenateurScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8FF),
+      backgroundColor: const Color(0xFFE6E6FA),
       body: Stack(
         children: [
         Container(
@@ -187,7 +187,7 @@ class _SenateurScreenState extends State<SenateurScreen> with TickerProviderStat
     ),
     ),
     ),
-      
+
     ],
     ),
     ),

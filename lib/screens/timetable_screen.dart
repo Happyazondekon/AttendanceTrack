@@ -254,11 +254,11 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF4338CA) : Colors.transparent,
+                  color: isSelected ? const Color(0xFF0D147F) : Colors.transparent,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: isSelected ? [
                     BoxShadow(
-                      color: const Color(0xFF4338CA).withOpacity(0.3),
+                      color: const Color(0xFF0D147F).withOpacity(0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -297,7 +297,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
   }
 
   List<Color> get courseColors => [
-    const Color(0xFF4F46E5),
+    const Color(0xFF0D147F),
     const Color(0xFF059669),
     const Color(0xFFDC2626),
     const Color(0xFF7C3AED),
@@ -511,7 +511,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
             end: Alignment.bottomCenter,
             colors: [
               Color(0xFFE6E6FA),
-              Color(0xFF0D147F),
+              Color(0xFFE6E6FA),
             ],
           ),
         ),
@@ -647,7 +647,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                                   ElevatedButton(
                                     onPressed: fetchSchedule,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF4338CA),
+                                      backgroundColor: const Color(0xFF0D147F),
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                                       shape: RoundedRectangleBorder(

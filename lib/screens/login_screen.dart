@@ -317,7 +317,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.blue.shade400, Colors.blue.shade600],
+                      colors: [Colors.blue.shade400, Color(0xFF0D147F)],
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -349,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide(
-                    color: Colors.blue.shade400,
+                    color: Color(0xFF0D147F),
                     width: 2,
                   ),
                 ),
@@ -388,7 +388,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.blue.shade500,
+            Color(0xFF0D147F),
             Colors.blue.shade700,
           ],
         )
@@ -490,7 +490,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
                             ShaderMask(
                               shaderCallback: (bounds) => LinearGradient(
-                                colors: [Colors.blue.shade700, Colors.purple.shade600],
+                                colors: [Color(0xFF0D147F), Color(0xFF0D147F)],
                               ).createShader(bounds),
                               child: const Text(
                                 'Connexion',
@@ -529,7 +529,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   children: [
                                     Icon(
                                       Icons.mark_email_read_outlined,
-                                      color: Colors.blue.shade600,
+                                      color: Color(0xFF0D147F),
                                       size: 20,
                                     ),
                                     const SizedBox(width: 12),
@@ -541,7 +541,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                           Text(
                                             'Code envoyé à $_userEmail',
                                             style: TextStyle(
-                                              color: Colors.blue.shade800,
+                                              color: Color(0xFF0D147F),
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
                                             ),
@@ -551,7 +551,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                             Text(
                                               'Renvoyer le code dans ${_countdown}s',
                                               style: TextStyle(
-                                                color: Colors.blue.shade600,
+                                                color: Color(0xFF0D147F),
                                                 fontSize: 12,
                                               ),
                                             )
@@ -561,7 +561,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                               child: Text(
                                                 'Renvoyer le code',
                                                 style: TextStyle(
-                                                  color: Colors.blue.shade700,
+                                                  color: Color(0xFF0D147F),
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w600,
                                                 ),

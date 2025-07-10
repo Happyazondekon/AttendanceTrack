@@ -416,7 +416,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFE6E6FA), Color(0xFF4C51BF)],
+            colors: [Color(0xFFE6E6FA), Color(0xFFE6E6FA)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -613,7 +613,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
                           colors: [Colors.grey.shade400, Colors.grey.shade600],
                         )
                             : const LinearGradient(
-                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          colors: [Color(0xFF0D147F), Color(0xFF0D147F),],
                         ),
                         onTap: isSubmitting ? null : _showValidationDialog,
                         isEnabled: !isSubmitting,

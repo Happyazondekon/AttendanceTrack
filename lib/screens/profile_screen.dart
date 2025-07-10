@@ -21,8 +21,8 @@ class ProfileScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFFFFFFF), // Blanc en haut
-              Color(0xFF0D147F), // Bleu foncé en bas
+              Color(0xFFE6E6FA), // Blanc en haut
+              Color(0xFFE6E6FA), // Bleu foncé en bas
             ],
           ),
         ),
@@ -65,7 +65,7 @@ class ProfileScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Color(0xFF0D147F).withOpacity(0.4),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -133,7 +133,7 @@ class ProfileScreen extends StatelessWidget {
                   'Raccourcis',
                   style: TextStyle(
                     fontFamily: 'Cabin',
-                    color: Colors.white,
+                    color: Color(0xFF0D147F),
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
                   ),
@@ -149,7 +149,7 @@ class ProfileScreen extends StatelessWidget {
                         title: 'Historique de Présences',
                         subtitle: 'Consultez vos présences passées',
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          colors: [Color(0xFF0D147F), Color(0xFF0D147F)],
                         ),
                         onTap: () {
                           Navigator.push(
@@ -167,7 +167,7 @@ class ProfileScreen extends StatelessWidget {
                         title: 'Mon Emploi du Temps',
                         subtitle: 'Visualisez votre planning',
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
+                          colors: [Color(0xFF0D147F), Color(0xFF0D147F)],
                         ),
                         onTap: () {
                           Navigator.push(
@@ -185,7 +185,7 @@ class ProfileScreen extends StatelessWidget {
                         title: 'Retour à l\'Accueil',
                         subtitle: 'Retournez au menu principal',
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          colors: [Color(0xFF0D147F), Color(0xFF0D147F)],
                         ),
                         onTap: () {
                           Navigator.pushReplacement(
@@ -430,7 +430,7 @@ class ProfileScreen extends StatelessWidget {
                 _performLogout(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4C51BF),
+                backgroundColor: const Color(0xFF0D147F),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

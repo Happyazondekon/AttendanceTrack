@@ -321,7 +321,7 @@ class _FAQChatBotPopupState extends State<FAQChatBotPopup>
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFFE6E6FA),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
