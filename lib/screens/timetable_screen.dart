@@ -90,7 +90,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('https://eneam2025.onrender.com/api/gestioncontrat/programmation/show'),
+        Uri.parse('http://10.0.2.2:8000/api/gestioncontrat/programmation/show'),
         headers: {
           'Accept': 'application/json',
         },

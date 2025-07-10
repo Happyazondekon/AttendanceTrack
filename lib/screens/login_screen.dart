@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       try {
         final response = await dio.post(
-          'https://eneam2025.onrender.com/auth/send-code',
+          'http://10.0.2.2:8000/auth/send-code',
           data: {'matricule': _matriculeController.text},
           options: Options(
             headers: {'Content-Type': 'application/json'},
@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       try {
         final response = await dio.post(
-          'https://eneam2025.onrender.com/auth/verify-code',
+          'http://10.0.2.2:8000/auth/verify-code',
           data: {'code': _codeController.text},
           options: Options(
             headers: {'Content-Type': 'application/json'},

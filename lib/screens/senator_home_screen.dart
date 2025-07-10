@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:eneam/screens/choose_courses_screen.dart';
 import 'package:eneam/screens/historique_cahier_screen.dart';
-import 'package:eneam/screens/course_status_screen.dart';
+
 
 class SenateurScreen extends StatefulWidget {
   const SenateurScreen({super.key});
@@ -187,39 +187,7 @@ class _SenateurScreenState extends State<SenateurScreen> with TickerProviderStat
     ),
     ),
     ),
-    const SizedBox(height: 20),
-    FadeTransition(
-    opacity: _fadeAnimation3,
-    child: SlideTransition(
-    position: _offsetAnimation3,
-    child: _ActionCardWithIcon(
-    title: 'Statut des cours',
-    description: 'Gérer les statuts des cours\nConfirmer ou annuler les cours prévus',
-    buttonText: 'Gérer les statuts',
-    icon: Icons.event_available,
-    color: const Color(0xFFB3DEFF),
-    onTap: () {
-    Navigator.push(
-    context,
-    PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const CourseStatusScreen(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-    const begin = Offset(1.0, 0.0);
-    const end = Offset.zero;
-    const curve = Curves.ease;
-    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-    final offsetAnimation = animation.drive(tween);
-    return SlideTransition(
-    position: offsetAnimation,
-    child: child,
-    );
-    },
-    ),
-    );
-    },
-    ),
-    ),
-    ),
+      
     ],
     ),
     ),

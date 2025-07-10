@@ -81,7 +81,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
       };
 
       print('=== DEBUT DEBUG REQUETE ===');
-      print('URL: https://eneam2025.onrender.com/api/valider');
+      print('URL: http://10.0.2.2:8000/api/valider');
       print('Headers: Authorization: Bearer $token');
       print('Data: $requestData');
       print('Position exacte: ${position.latitude}, ${position.longitude}');
@@ -90,7 +90,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
 
       // CORRECTION 3: Ajouter un timeout et améliorer les headers
       final response = await http.post(
-        Uri.parse('https://eneam2025.onrender.com/api/valider'),
+        Uri.parse('http://10.0.2.2:8000/api/valider'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -191,7 +191,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
   Future<bool> testConnectivity() async {
     try {
       final response = await http.get(
-        Uri.parse('https://eneam2025.onrender.com/api/test'),
+        Uri.parse('http://10.0.2.2:8000/api/test'),
         headers: {'Accept': 'application/json'},
       ).timeout(const Duration(seconds: 10));
       return response.statusCode == 200;

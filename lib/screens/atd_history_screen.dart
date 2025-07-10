@@ -86,7 +86,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('https://eneam2025.onrender.com/api/suivi-presence/presences/etudiant/${user.id}'),
+        Uri.parse('http://10.0.2.2:8000/api/suivi-presence/presences/etudiant/${user.id}'),
         headers: {
           'Accept': 'application/json',
         },
@@ -111,8 +111,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 print('Erreur parsing date: $e');
               }
 
-              // Récupération des informations du cours et de l'UE
-              final ue = attendance['ue'];
+              // Récupération des informations de l'ECUE
+              final ecue = attendance['ecue'];
 
               return {
                 'id': attendance['id'],
@@ -122,11 +122,11 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 'heure': datePresence != null
                     ? DateFormat('HH:mm').format(datePresence)
                     : 'N/A',
-                'status': attendance['status'] ?? 'N/A',
+                'status': attendance['status'] ?? 'en attente',
                 'present': attendance['status'] == 'present',
-                'matiere': ue?['nom'] ?? 'Matière non définie',
-                'code_ue': ue?['code'] ?? 'N/A',
-                'valide': attendance['valide'] == 1,
+                'matiere': ecue?['nom'] ?? 'ECUE non définie',
+                'code_ecue': ecue?['code'] ?? 'N/A',
+                'valide': attendance['valide'] == 1 || attendance['valide'] == true,
               };
             }).where((attendance) {
               return attendance['date_presence'] == currentDateStr;
@@ -234,7 +234,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
 
   Widget _buildAttendanceCard(
       String matiere,
-      String codeUe,
+      String codeEcue,
       String time,
       String status,
       bool isPresent,
@@ -326,7 +326,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            codeUe,
+                            codeEcue,
                             style: const TextStyle(
                               fontFamily: 'Cabin',
                               fontSize: 13,
@@ -340,22 +340,38 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isPresent ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                        color: status == 'en attente'
+                            ? Colors.orange.withOpacity(0.1)
+                            : isPresent
+                            ? Colors.green.withOpacity(0.1)
+                            : Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            isPresent ? Icons.check_circle : Icons.cancel,
-                            color: isPresent ? Colors.green : Colors.red,
+                            status == 'en attente'
+                                ? Icons.access_time
+                                : isPresent
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color: status == 'en attente'
+                                ? Colors.orange
+                                : isPresent
+                                ? Colors.green
+                                : Colors.red,
                             size: 16,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             status.toUpperCase(),
                             style: TextStyle(
-                              color: isPresent ? Colors.green : Colors.red,
+                              color: status == 'en attente'
+                                  ? Colors.orange
+                                  : isPresent
+                                  ? Colors.green
+                                  : Colors.red,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -616,7 +632,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                               final colorIndex = index % attendanceColors.length;
                               return _buildAttendanceCard(
                                 attendance['matiere'],
-                                attendance['code_ue'],
+                                attendance['code_ecue'],
                                 attendance['heure'],
                                 attendance['status'],
                                 attendance['present'],
