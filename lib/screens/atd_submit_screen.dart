@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../services/token_service.dart';
 import '../services/user_manager.dart';
+import 'atd_history_screen.dart';
+
 
 class PresenceValidationScreen extends StatefulWidget {
   final String qrCode;
@@ -81,7 +83,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
       };
 
       print('=== DEBUT DEBUG REQUETE ===');
-      print('URL: http://10.0.2.2:8000/api/valider');
+      print('URL: https://eneam2025.onrender.com/api/valider');
       print('Headers: Authorization: Bearer $token');
       print('Data: $requestData');
       print('Position exacte: ${position.latitude}, ${position.longitude}');
@@ -90,7 +92,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
 
       // CORRECTION 3: Ajouter un timeout et améliorer les headers
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:8000/api/valider'),
+        Uri.parse('https://eneam2025.onrender.com/api/valider'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -136,7 +138,14 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
               ),
             ),
           );
-          Navigator.pop(context);
+
+          // MODIFICATION: Rediriger vers l'écran d'historique après validation réussie
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AttendanceHistoryScreen(),
+            ),
+          );
         }
       } else {
         // CORRECTION 5: Améliorer la gestion des erreurs spécifiques
@@ -587,7 +596,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
                     'Actions',
                     style: TextStyle(
                       fontFamily: 'Cabin',
-                      color: Colors.white,
+                      color: Color(0xFF0D147F),
                       fontWeight: FontWeight.bold,
                       fontSize: 22,
                     ),

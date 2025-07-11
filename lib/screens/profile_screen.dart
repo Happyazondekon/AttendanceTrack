@@ -55,32 +55,32 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 25), // Réduit de 40 à 25
 
-                // Section Profile Card
+                // Section Profile Card - compacte
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.95),
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(20), // Réduit de 25 à 20
                     boxShadow: [
                       BoxShadow(
                         color: Color(0xFF0D147F).withOpacity(0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                        blurRadius: 15, // Réduit de 20 à 15
+                        offset: const Offset(0, 8), // Réduit de 10 à 8
                       ),
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(25.0),
+                    padding: const EdgeInsets.all(20.0), // Réduit de 25 à 20
                     child: Column(
                       children: [
-                        // Avatar avec effet
+                        // Avatar avec effet - réduit
                         Stack(
                           children: [
                             Container(
-                              width: 120,
-                              height: 120,
+                              width: 80, // Réduit de 120 à 80
+                              height: 80, // Réduit de 120 à 80
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: const LinearGradient(
@@ -94,20 +94,20 @@ class ProfileScreen extends StatelessWidget {
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(0xFF4C51BF).withOpacity(0.3),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 5),
+                                    blurRadius: 10, // Réduit de 15 à 10
+                                    offset: const Offset(0, 4), // Réduit de 5 à 4
                                   ),
                                 ],
                               ),
                               child: const Icon(
                                 Icons.person,
-                                size: 60,
+                                size: 40, // Réduit de 60 à 40
                                 color: Colors.white,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15), // Réduit de 20 à 15
 
                         // Informations utilisateur
                         _buildUserInfoCard(
@@ -115,7 +115,7 @@ class ProfileScreen extends StatelessWidget {
                           title: 'Email',
                           value: userEmail,
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 10), // Réduit de 15 à 10
                         _buildUserInfoCard(
                           icon: Icons.badge_outlined,
                           title: 'Matricule',
@@ -126,7 +126,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 20), // Réduit de 30 à 20
 
                 // Section Raccourcis
                 const Text(
@@ -135,13 +135,13 @@ class ProfileScreen extends StatelessWidget {
                     fontFamily: 'Cabin',
                     color: Color(0xFF0D147F),
                     fontWeight: FontWeight.bold,
-                    fontSize: 22,
+                    fontSize: 20, // Réduit de 22 à 20
                   ),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 10), // Réduit de 15 à 10
 
                 Expanded(
-                  child: ListView(
+                  child: Column( // Remplacé ListView par Column
                     children: [
                       _buildModernButton(
                         context,
@@ -160,7 +160,7 @@ class ProfileScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 12), // Réduit de 15 à 12
                       _buildModernButton(
                         context,
                         icon: Icons.calendar_today_outlined,
@@ -178,7 +178,7 @@ class ProfileScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 12), // Réduit de 15 à 12
                       _buildModernButton(
                         context,
                         icon: Icons.home_outlined,
@@ -246,10 +246,10 @@ class ProfileScreen extends StatelessWidget {
     required String value,
   }) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(12), // Réduit de 15 à 12
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12), // Réduit de 15 à 12
         border: Border.all(
           color: Colors.grey.shade200,
           width: 1,
@@ -258,19 +258,19 @@ class ProfileScreen extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 35, // Réduit de 40 à 35
+            height: 35, // Réduit de 40 à 35
             decoration: BoxDecoration(
               color: const Color(0xFF4C51BF).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(17.5), // Ajusté
             ),
             child: Icon(
               icon,
               color: const Color(0xFF4C51BF),
-              size: 20,
+              size: 18, // Réduit de 20 à 18
             ),
           ),
-          const SizedBox(width: 15),
+          const SizedBox(width: 12), // Réduit de 15 à 12
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,7 +279,7 @@ class ProfileScreen extends StatelessWidget {
                   title,
                   style: TextStyle(
                     fontFamily: 'Cabin',
-                    fontSize: 12,
+                    fontSize: 11, // Réduit de 12 à 11
                     color: Colors.grey.shade600,
                     fontWeight: FontWeight.w500,
                   ),
@@ -289,7 +289,7 @@ class ProfileScreen extends StatelessWidget {
                   value,
                   style: const TextStyle(
                     fontFamily: 'Cabin',
-                    fontSize: 16,
+                    fontSize: 14, // Réduit de 16 à 14
                     color: Color(0xFF2D3748),
                     fontWeight: FontWeight.w600,
                   ),
@@ -313,34 +313,34 @@ class ProfileScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16), // Réduit de 20 à 16
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18), // Réduit de 20 à 18
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              blurRadius: 8, // Réduit de 10 à 8
+              offset: const Offset(0, 4), // Réduit de 5 à 4
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: 45, // Réduit de 50 à 45
+              height: 45, // Réduit de 50 à 45
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(22.5), // Ajusté
               ),
               child: Icon(
                 icon,
                 color: Colors.white,
-                size: 24,
+                size: 22, // Réduit de 24 à 22
               ),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 12), // Réduit de 15 à 12
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,7 +350,7 @@ class ProfileScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontFamily: 'Cabin',
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 15, // Réduit de 16 à 15
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -360,7 +360,7 @@ class ProfileScreen extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Cabin',
                       color: Colors.white.withOpacity(0.8),
-                      fontSize: 12,
+                      fontSize: 11, // Réduit de 12 à 11
                     ),
                   ),
                 ],
@@ -369,7 +369,7 @@ class ProfileScreen extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios,
               color: Colors.white.withOpacity(0.7),
-              size: 16,
+              size: 14, // Réduit de 16 à 14
             ),
           ],
         ),

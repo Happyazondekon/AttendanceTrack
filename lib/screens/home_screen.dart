@@ -262,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: SlideTransition(
                       position: _offsetAnimation3,
                       child: _ActionCardWithIcon(
-                        title: 'Scanner pour valider',
+                        title: 'Valider ma présence',
                         description: 'Scannez un QR code et marquez votre présence facilement',
                         buttonText: 'Scanner maintenant',
                         icon: Icons.qr_code_scanner,

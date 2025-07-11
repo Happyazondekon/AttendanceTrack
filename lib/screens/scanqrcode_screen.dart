@@ -81,183 +81,181 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
 
-                // Zone de scan principale
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+                // Zone de scan principale - réduite
+                Container(
+                  height: screenHeight * 0.35, // Hauteur fixe réduite
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.95),
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: isScanning && cameraController != null
+                        ? Stack(
+                      children: [
+                        MobileScanner(
+                          controller: cameraController!,
+                          onDetect: (capture) {
+                            final List<Barcode> barcodes = capture.barcodes;
+                            if (barcodes.isNotEmpty) {
+                              final String? code = barcodes.first.rawValue;
+                              if (code != null) {
+                                _stopScanning();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PresenceValidationScreen(qrCode: code),
+                                  ),
+                                ).then((_) {
+                                  if (mounted) {
+                                    _startScanning();
+                                  }
+                                });
+                              }
+                            }
+                          },
+                        ),
+                        // Overlay de scan avec animation
+                        Center(
+                          child: Container(
+                            width: 200, // Réduit de 250 à 200
+                            height: 200, // Réduit de 250 à 200
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 3,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Stack(
+                              children: [
+                                // Coins du cadre
+                                Positioned(
+                                  top: 0,
+                                  left: 0,
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF0D147F),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF0D147F),
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  left: 0,
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                        bottomRight: Radius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: isScanning && cameraController != null
-                          ? Stack(
+                    )
+                        : Padding(
+                      padding: const EdgeInsets.all(20.0), // Réduit de 30 à 20
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          MobileScanner(
-                            controller: cameraController!,
-                            onDetect: (capture) {
-                              final List<Barcode> barcodes = capture.barcodes;
-                              if (barcodes.isNotEmpty) {
-                                final String? code = barcodes.first.rawValue;
-                                if (code != null) {
-                                  _stopScanning();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PresenceValidationScreen(qrCode: code),
-                                    ),
-                                  ).then((_) {
-                                    if (mounted) {
-                                      _startScanning();
-                                    }
-                                  });
-                                }
-                              }
-                            },
-                          ),
-                          // Overlay de scan avec animation
-                          Center(
-                            child: Container(
-                              width: 250,
-                              height: 250,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3,
+                          Container(
+                            width: 80, // Réduit de 120 à 80
+                            height: 80, // Réduit de 120 à 80
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF4C51BF), Color(0xFF0D147F)],
+                              ),
+                              borderRadius: BorderRadius.circular(40), // Ajusté
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF4C51BF).withOpacity(0.3),
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 5),
                                 ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Stack(
-                                children: [
-                                  // Coins du cadre
-                                  Positioned(
-                                    top: 0,
-                                    left: 0,
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFF0D147F),
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(20),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 0,
-                                    right: 0,
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFF0D147F),
-                                        borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(20),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    left: 0,
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(20),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.only(
-                                          bottomRight: Radius.circular(20),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              ],
                             ),
+                            child: const Icon(
+                              Icons.qr_code_scanner,
+                              size: 40, // Réduit de 60 à 40
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 20), // Réduit de 30 à 20
+                          const Text(
+                            'Prêt à scanner',
+                            style: TextStyle(
+                              fontFamily: 'Cabin',
+                              fontSize: 20, // Réduit de 24 à 20
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2D3748),
+                            ),
+                          ),
+                          const SizedBox(height: 8), // Réduit de 10 à 8
+                          Text(
+                            'Appuyez sur le bouton pour commencer le scan',
+                            style: TextStyle(
+                              fontFamily: 'Cabin',
+                              fontSize: 12, // Réduit de 14 à 12
+                              color: Colors.grey.shade600,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
-                      )
-                          : Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFF4C51BF), Color(0xFF0D147F)],
-                                ),
-                                borderRadius: BorderRadius.circular(60),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF4C51BF).withOpacity(0.3),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.qr_code_scanner,
-                                size: 60,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 30),
-                            const Text(
-                              'Prêt à scanner',
-                              style: TextStyle(
-                                fontFamily: 'Cabin',
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF2D3748),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              'Appuyez sur le bouton pour commencer le scan',
-                              style: TextStyle(
-                                fontFamily: 'Cabin',
-                                fontSize: 14,
-                                color: Colors.grey.shade600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 20), // Réduit de 30 à 20
 
                 // Section boutons
                 if (!isScanning) ...[
@@ -269,17 +267,16 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                         fontFamily: 'Cabin',
                         color: Color(0xFF0D147F),
                         fontWeight: FontWeight.bold,
-                        fontSize: 22,
+                        fontSize: 20, // Réduit de 22 à 20
                       ),
                     ),
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 10), // Réduit de 15 à 10
                 ],
 
-                // Boutons d'action
+                // Boutons d'action - maintenant sans scroll
                 Expanded(
-                  flex: 2,
-                  child: ListView(
+                  child: Column(
                     children: [
                       // Bouton Scanner principal
                       _buildModernActionButton(
@@ -306,7 +303,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                       ),
 
                       if (!isScanning) ...[
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 12), // Réduit de 15 à 12
 
                         _buildModernActionButton(
                           context,
@@ -326,7 +323,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                           },
                         ),
 
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 12), // Réduit de 15 à 12
 
                         _buildModernActionButton(
                           context,
@@ -396,34 +393,34 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16), // Réduit de 20 à 16
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18), // Réduit de 20 à 18
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              blurRadius: 8, // Réduit de 10 à 8
+              offset: const Offset(0, 4), // Réduit de 5 à 4
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: 45, // Réduit de 50 à 45
+              height: 45, // Réduit de 50 à 45
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(22.5), // Ajusté
               ),
               child: Icon(
                 icon,
                 color: Colors.white,
-                size: 24,
+                size: 22, // Réduit de 24 à 22
               ),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 12), // Réduit de 15 à 12
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,7 +430,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                     style: const TextStyle(
                       fontFamily: 'Cabin',
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 15, // Réduit de 16 à 15
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -443,7 +440,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
                     style: TextStyle(
                       fontFamily: 'Cabin',
                       color: Colors.white.withOpacity(0.8),
-                      fontSize: 12,
+                      fontSize: 11, // Réduit de 12 à 11
                     ),
                   ),
                 ],
@@ -452,7 +449,7 @@ class _ScanQRCodeScreenState extends State<ScanQRCodeScreen> {
             Icon(
               Icons.arrow_forward_ios,
               color: Colors.white.withOpacity(0.7),
-              size: 16,
+              size: 14, // Réduit de 16 à 14
             ),
           ],
         ),
