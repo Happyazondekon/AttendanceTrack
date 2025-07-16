@@ -90,7 +90,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('https://eneam2025.onrender.com/api/gestioncontrat/programmation/show'),
+        Uri.parse('http://192.168.91.2:8000/api/gestioncontrat/programmation/show'),
         headers: {
           'Accept': 'application/json',
         },
@@ -120,7 +120,8 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
               DateTime? dateDebut;
               try {
                 if (course['date_debut'] != null && course['date_debut'].toString().isNotEmpty) {
-                  dateDebut = DateTime.parse(course['date_debut'].toString());
+                  // Interpréter la date comme UTC, puis la convertir en heure locale de l'appareil
+                  dateDebut = DateTime.parse(course['date_debut'].toString()).toLocal();
                 }
               } catch (e) {
                 print('Erreur parsing date_debut: $e');
@@ -153,20 +154,26 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
               String plageFin = '';
               try {
                 if (course['plage_debut'] != null && course['plage_debut'].toString().isNotEmpty) {
-                  final dateTimeDebut = DateTime.parse(course['plage_debut'].toString());
+                  // Le serveur envoie 'YYYY-MM-DDTHH:mm:ss', ce qui est un format ISO 8601.
+                  // DateTime.parse() gère ce format. Nous devons spécifier qu'il s'agit d'UTC
+                  // si le serveur envoie l'heure de cette manière, puis la convertir en local.
+                  final dateTimeDebut = DateTime.parse(course['plage_debut'].toString()).toLocal();
                   plageDebut = DateFormat('HH:mm').format(dateTimeDebut);
                 }
               } catch (e) {
                 print('Erreur parsing plage_debut: $e');
+                plageDebut = ''; // Assurez-vous qu'elle est vide en cas d'erreur
               }
 
               try {
                 if (course['plage_fin'] != null && course['plage_fin'].toString().isNotEmpty) {
-                  final dateTimeFin = DateTime.parse(course['plage_fin'].toString());
+                  // Idem pour la plage de fin
+                  final dateTimeFin = DateTime.parse(course['plage_fin'].toString()).toLocal();
                   plageFin = DateFormat('HH:mm').format(dateTimeFin);
                 }
               } catch (e) {
                 print('Erreur parsing plage_fin: $e');
+                plageFin = ''; // Assurez-vous qu'elle est vide en cas d'erreur
               }
 
               String salle = 'N/A';

@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       try {
         final response = await dio.post(
-          'https://eneam2025.onrender.com/auth/send-code',
+          'http://192.168.91.2:8000/auth/send-code',
           data: {'matricule': _matriculeController.text},
           options: Options(
             headers: {'Content-Type': 'application/json'},
@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       try {
         final response = await dio.post(
-          'https://eneam2025.onrender.com/auth/verify-code',
+          'http://192.168.91.2:8000/auth/verify-code',
           data: {'code': _codeController.text},
           options: Options(
             headers: {'Content-Type': 'application/json'},
@@ -180,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
           // CORRECTION: Récupérer le token depuis les cookies
           String? token;
-          final cookies = await cookieJar.loadForRequest(Uri.parse('https://eneam2025.onrender.com'));
+          final cookies = await cookieJar.loadForRequest(Uri.parse('http://192.168.91.2:8000'));
           for (var cookie in cookies) {
             if (cookie.name == 'authToken' || cookie.name == 'token') {
               token = cookie.value;

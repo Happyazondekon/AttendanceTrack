@@ -86,7 +86,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('https://eneam2025.onrender.com/api/suivi-presence/presences/etudiant/${user.id}'),
+        Uri.parse('http://192.168.91.2:8000/api/suivi-presence/presences/etudiant/${user.id}'),
         headers: {
           'Accept': 'application/json',
         },
@@ -106,7 +106,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
               // Conversion de la date de présence
               DateTime? datePresence;
               try {
-                datePresence = DateTime.parse(attendance['date_presence']);
+                datePresence = DateTime.parse(attendance['date_presence']).toLocal();
               } catch (e) {
                 print('Erreur parsing date: $e');
               }
