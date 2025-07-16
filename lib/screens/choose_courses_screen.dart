@@ -1,56 +1,91 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:eneam/screens/formulaire_add_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../services/user_manager.dart';
+import 'package:intl/intl.dart';
 
-class ChooseScreen extends StatelessWidget {
+
+class ChooseScreen extends StatefulWidget {
   const ChooseScreen({super.key});
 
   @override
+  State<ChooseScreen> createState() => _ChooseScreenState();
+}
+
+class _ChooseScreenState extends State<ChooseScreen> {
+  List<Map<String, dynamic>> subjects = [];
+  bool isLoading = true;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProgrammations();
+  }
+
+  Future<void> _loadProgrammations() async {
+    try {
+      final userManager = UserManager();
+      final user = userManager.user;
+
+      if (user == null) {
+        throw Exception('Utilisateur non connecté');
+      }
+
+      final response = await http.get(
+        Uri.parse('http://192.168.91.2:8000/api/gestioncontrat/programmation/by-classe?classe_id=${user.classeId}'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['data'] != null) {
+          setState(() {
+            subjects = (data['data'] as List).map((prog) {
+              // Formatage des dates
+              String dateDebut = '';
+              String dateFin = '';
+              if (prog['date_debut'] != null) {
+                final debut = DateTime.parse(prog['date_debut']).toLocal(); // ← conversion au fuseau local
+                dateDebut = DateFormat('dd/MM/yyyy').format(debut);
+              }
+
+              if (prog['date_fin'] != null) {
+                final fin = DateTime.parse(prog['date_fin']).toLocal(); // ← conversion au fuseau local
+                dateFin = DateFormat('dd/MM/yyyy').format(fin);
+              }
+
+
+              return {
+                'title': prog['ue']?['nom'] ?? 'Sans titre', // Utilisation du nom de l'UE
+                'semester': 'Semestre ${prog['semestre']?.toString() ?? '?'}',
+                'hours': '${prog['heure_execute']?.toString() ?? '0'}h sur ${prog['heure_theorique']?.toString() ?? '0'}h',
+                'period': 'Du $dateDebut au $dateFin',
+                'id': prog['id']?.toString() ?? '',
+                'code_ue': prog['code_ue']?.toString() ?? '',
+                'salle': prog['salle']?.toString() ?? 'Non définie'
+              };
+            }).toList();
+            isLoading = false;
+          });
+        }
+      } else {
+        throw Exception('Erreur lors de la récupération des programmations: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final subjects = [
-  {
-    'title': 'Intelligence Artificielle',
-    'semester': 'Semestre 5',
-
-    'hours': '24h sur 30h',
-    'period': 'Du 14/03/2025 au 24/04/2025',
-  },
-  {
-    'title': 'Recherche Opérationnelle',
-    'semester': 'Semestre 5',
-    'hours': '15h sur 30h',
-    'period': 'Du 18/03/2025 au 20/04/2025',
-  },
-
-
-  {
-    'title': 'Bases de données',
-    'semester': 'Semestre 5',
-    'hours': '12h sur 40h',
-    'period': 'Du 20/03/2025 au 28/04/2025',
-  },
-  {
-    'title': 'Maths-Info',
-    'semester': 'Semestre 5',
-    'hours': '16h sur 30h',
-    'period': 'Du 10/03/2025 au 10/04/2025',
-  },
-  {
-    'title': 'Comptabilité financière',
-    'semester': 'Semestre 6',
-    'hours': '06h sur 40h',
-    'period': 'Du 01/04/2025 au 15/05/2025',
-  },
-  {
-    'title': 'Développement mobile',
-    'semester': 'Semestre 6',
-    'hours': '12h sur 30h',
-    'period': 'Du 05/04/2025 au 25/05/2025',
-  },
-];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -61,7 +96,7 @@ class ChooseScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Choisir une matière',
+          'Choisir une programmation',
           style: TextStyle(
             color: Color(0xFF1C2674),
             fontWeight: FontWeight.bold,
@@ -76,12 +111,37 @@ class ChooseScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Pour continuer veuillez selectionné la matière concernée.',
+              'Pour continuer veuillez selectionné la programmation concernée.',
               style: TextStyle(fontSize: 16, color: Colors.black87),
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: ListView.separated(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1C2674)),
+              ))
+                  : error != null
+                  ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Erreur: $error',
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _loadProgrammations,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1C2674),
+                      ),
+                      child: const Text('Réessayer'),
+                    ),
+                  ],
+                ),
+              )
+                  : ListView.separated(
                 itemCount: subjects.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
@@ -142,7 +202,6 @@ class ChooseScreen extends StatelessWidget {
                                   fontStyle: FontStyle.italic,
                                 ),
                               ),
-
                             ],
                           ),
                         ),
@@ -151,7 +210,10 @@ class ChooseScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => FormulaireAddScreen(matiere: "Développement mobile"),
+                                builder: (_) => FormulaireAddScreen(
+                                  matiere: item['title']!,
+                                  programmationId: item['id']!,
+                                ),
                               ),
                             );
                           },
@@ -165,8 +227,8 @@ class ChooseScreen extends StatelessWidget {
                             padding: const EdgeInsets.all(8),
                             child: Image.asset(
                               'assets/oblique.png',
-                              color: Color(0xFF0F1F84),
-                             ),
+                              color: const Color(0xFF0F1F84),
+                            ),
                           ),
                         ),
                       ],
@@ -180,17 +242,4 @@ class ChooseScreen extends StatelessWidget {
       ),
     );
   }
-} 
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

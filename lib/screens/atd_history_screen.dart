@@ -482,7 +482,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                               'Historique de Présences',
                               style: TextStyle(
                                 fontFamily: 'Cabin',
-                                fontSize: 26,
+                                fontSize: 22,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF2D3748),
                                 letterSpacing: -0.8,

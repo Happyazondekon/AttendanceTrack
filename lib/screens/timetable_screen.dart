@@ -90,7 +90,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.91.2:8000/api/gestioncontrat/programmation/show'),
+        Uri.parse('http://192.168.91.2:8000/api/gestioncontrat/programmation/by-classe?classe_id=${user.classeId}'),
         headers: {
           'Accept': 'application/json',
         },
@@ -560,7 +560,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                               'Emploi du temps',
                               style: TextStyle(
                                 fontFamily: 'Cabin',
-                                fontSize: 26,
+                                fontSize: 22,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF2D3748),
                                 letterSpacing: -0.8,

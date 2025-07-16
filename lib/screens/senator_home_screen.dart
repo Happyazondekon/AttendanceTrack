@@ -126,9 +126,9 @@ class _SenateurScreenState extends State<SenateurScreen> with TickerProviderStat
     child: SlideTransition(
     position: _offsetAnimation1,
     child: _ActionCard(
-    title: 'Formulaire',
+    title: 'Cahier des textes',
     description: 'Remplir le cahier des textes\nAjoutez les détails des cours de chaque jours',
-    buttonText: 'Accédez au formulaire',
+    buttonText: 'Remplissez maintenant',
     iconPath: 'assets/send.png',
     color: const Color(0xFFB3DEFF),
     onTap: () {
