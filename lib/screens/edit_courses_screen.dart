@@ -164,7 +164,8 @@ class _EditCourseScreenState extends State<EditCourseScreen> {
       final Map<String, dynamic> updateData = {
         'programmation_id': cahier['programmation_id'], // Ajouter ce champ
         'ecue_id': cahier['ecue_id'],                   // Ajouter ce champ
-        'date': cahier['date']?.split('T').first,       // Ajouter ce champ, prendre seulement la partie date
+        'date': DateTime.parse(cahier['date']).toLocal().toIso8601String().split('T').first,
+        // Ajouter ce champ, prendre seulement la partie date
         'heure_debut': convertTimeToAPIFormat(heureDebutController.text), // Utiliser le nouveau format HH:mm:ss
         'heure_fin': convertTimeToAPIFormat(heureFinController.text),     // Utiliser le nouveau format HH:mm:ss
         'duree': dureeCalculated,
