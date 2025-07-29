@@ -12,9 +12,6 @@ class _HistoriqueCahierScreenState extends State<HistoriqueCahierScreen> {
   String selectedFilter = "Tous";
   final List<String> filters = [
     "Tous",
-    "Intelligence Artificielle",
-    "Bases de données",
-    "Anglais des affaires"
   ];
 
   final TextEditingController searchController = TextEditingController();
