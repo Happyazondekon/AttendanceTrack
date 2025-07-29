@@ -5,8 +5,7 @@ import 'package:lottie/lottie.dart';
 
 // Service IA intégré
 class AIService {
-  static const String _groqApiKey = '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'; // Gratuit et rapide
-  static const String _cohereApiKey = 'zvLgM478mlhjXEyJ2R0bKKIGXgJpRiHXNQrLIRuo'; // Gratuit avec limite
+
   static Future<String> getGroqResponse(String prompt) async {
     try {
       final response = await http.post(
