@@ -5,7 +5,8 @@ import 'package:lottie/lottie.dart';
 
 // Service IA intégré
 class AIService {
-
+  static const String _groqApiKey = ''; // Gratuit et rapide
+  static const String _cohereApiKey = ''; // Gratuit avec limite
   static Future<String> getGroqResponse(String prompt) async {
     try {
       final response = await http.post(
@@ -16,6 +17,7 @@ class AIService {
         },
         body: jsonEncode({
           'model': 'llama3-8b-8192',
+
           'messages': [
             {
               'role': 'system',
