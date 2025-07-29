@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       try {
         final response = await dio.post(
-          'http://192.168.91.2:8000/auth/send-code',
+          'http://192.168.181.2:8000/auth/send-code',
           data: {'matricule': _matriculeController.text},
           options: Options(
             headers: {'Content-Type': 'application/json'},
@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       try {
         final response = await dio.post(
-          'http://192.168.91.2:8000/auth/verify-code',
+          'http://192.168.181.2:8000/auth/verify-code',
           data: {'code': _codeController.text},
           options: Options(
             headers: {'Content-Type': 'application/json'},

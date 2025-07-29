@@ -90,7 +90,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.91.2:8000/api/gestioncontrat/programmation/by-classe?classe_id=${user.classeId}'),
+        Uri.parse('http://192.168.181.2:8000/api/gestioncontrat/programmation/by-classe?classe_id=${user.classeId}'),
         headers: {
           'Accept': 'application/json',
         },
@@ -128,16 +128,19 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                 dateDebut = null;
               }
 
-              String matiere = 'N/A';
+              // --- MODIFICATION START ---
+              String ecueName = 'N/A'; // Variable to hold the ECUE name
               try {
-                if (course['ue'] != null && course['ue']['nom'] != null) {
-                  matiere = course['ue']['nom'].toString();
-                } else if (course['code_ue'] != null) {
-                  matiere = course['code_ue'].toString();
+                // Check if 'ecue_relation' exists and has a 'nom' field
+                if (course['ecue_relation'] != null && course['ecue_relation']['nom'] != null) {
+                  ecueName = course['ecue_relation']['nom'].toString();
+                } else if (course['code_ecue'] != null) { // Fallback to code_ecue if relation not found
+                  ecueName = course['code_ecue'].toString();
                 }
               } catch (e) {
-                print('Erreur parsing matiere: $e');
+                print('Erreur parsing ecueName: $e');
               }
+              // --- MODIFICATION END ---
 
               String enseignant = 'N/A';
               try {
@@ -199,7 +202,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
               }
 
               return {
-                'matiere': matiere,
+                'matiere': ecueName, // Assign the extracted ECUE name here
                 'plage_debut': plageDebut,
                 'plage_fin': plageFin,
                 'salle': salle,
@@ -315,7 +318,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
   ];
 
   Widget _buildCourseCard(
-      String subject,
+      String subject, // This will now be the ECUE name
       String startTime,
       String endTime,
       String room,
@@ -390,7 +393,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text(
-                        subject,
+                        subject, // This will now display the ECUE name
                         style: TextStyle(
                           fontFamily: 'Cabin',
                           fontSize: 18,
@@ -709,7 +712,7 @@ class _AttendanceHistoryScreenState extends State<EmploiDuTempsScreen> {
                               final course = scheduleData[index];
                               final colorIndex = index % courseColors.length;
                               return _buildCourseCard(
-                                course['matiere'],
+                                course['matiere'], // This now correctly passes the ECUE name
                                 course['plage_debut'],
                                 course['plage_fin'],
                                 course['salle'],

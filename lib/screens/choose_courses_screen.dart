@@ -34,7 +34,7 @@ class _ChooseScreenState extends State<ChooseScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.91.2:8000/api/gestioncontrat/programmation/by-classe?classe_id=${user.classeId}'),
+        Uri.parse('http://192.168.181.2:8000/api/gestioncontrat/programmation/by-classe?classe_id=${user.classeId}'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',

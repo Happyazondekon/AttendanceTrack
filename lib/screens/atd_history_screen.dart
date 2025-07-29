@@ -86,7 +86,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.91.2:8000/api/suivi-presence/presences/etudiant/${user.id}'),
+        Uri.parse('http://192.168.181.2:8000/api/suivi-presence/presences/etudiant/${user.id}'),
         headers: {
           'Accept': 'application/json',
         },

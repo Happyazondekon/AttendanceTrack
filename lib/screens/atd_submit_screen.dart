@@ -83,7 +83,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
       };
 
       print('=== DEBUT DEBUG REQUETE ===');
-      print('URL: http://192.168.91.2:8000/api/valider');
+      print('URL: http://192.168.181.2:8000/api/valider');
       print('Headers: Authorization: Bearer $token');
       print('Data: $requestData');
       print('Position exacte: ${position.latitude}, ${position.longitude}');
@@ -92,7 +92,7 @@ class _PresenceValidationScreenState extends State<PresenceValidationScreen> {
 
       // CORRECTION 3: Ajouter un timeout et améliorer les headers
       final response = await http.post(
-        Uri.parse('http://192.168.91.2:8000/api/valider'),
+        Uri.parse('http://192.168.181.2:8000/api/valider'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',

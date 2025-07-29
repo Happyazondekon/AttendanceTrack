@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../config/api_config.dart';
-import '../services/user_manager.dart';
+import '../config/api_config.dart'; // Ensure this path is correct
+import '../services/user_manager.dart'; // Ensure this path is correct
 
 class FormulaireAddScreen extends StatefulWidget {
   final String matiere;
@@ -29,8 +29,8 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
   DateTime? selectedDate;
   TimeOfDay? selectedHeureDebut;
   TimeOfDay? selectedHeureFin;
-  bool _isLoading = false;
-  bool _isLoadingProgrammation = true;
+  bool _isLoading = false; // For form submission
+  bool _isLoadingProgrammation = true; // For initial programmation details fetch
   Map<String, dynamic>? _programmationDetails;
 
   @override
@@ -52,7 +52,7 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
   Future<void> _loadProgrammationDetails() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.91.2:8000/api/gestioncontrat/programmation/${widget.programmationId}'),
+        Uri.parse('http://192.168.181.2:8000/api/gestioncontrat/programmation/${widget.programmationId}'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -63,18 +63,20 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
         final data = json.decode(response.body);
         setState(() {
           _programmationDetails = data['data'];
-
           _isLoadingProgrammation = false;
         });
       } else {
-        throw Exception('Erreur lors de la récupération des détails');
+        // Log the error response body for debugging
+        print('Error loading programmation details: ${response.statusCode} - ${response.body}');
+        throw Exception('Erreur lors de la récupération des détails: ${response.statusCode}');
       }
     } catch (e) {
       setState(() {
         _isLoadingProgrammation = false;
-
+        _programmationDetails = null; // Ensure it's null on error
       });
       _showError('Erreur lors du chargement des détails: ${e.toString()}');
+      print('Exception during programmation details loading: $e'); // Log the exception
     }
   }
 
@@ -82,20 +84,35 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
     if (selectedHeureDebut != null && selectedHeureFin != null) {
       final debut = Duration(hours: selectedHeureDebut!.hour, minutes: selectedHeureDebut!.minute);
       final fin = Duration(hours: selectedHeureFin!.hour, minutes: selectedHeureFin!.minute);
-      final difference = fin - debut;
 
-      if (difference.inMinutes >= 0) {
-        final heures = difference.inHours;
-        final minutes = difference.inMinutes.remainder(60);
-        final texte = "${heures > 0 ? '$heures h ' : ''}${minutes > 0 ? '$minutes min' : ''}".trim();
-        setState(() {
-          _tempsController.text = texte.isEmpty ? "0 h" : texte;
-        });
-      } else {
-        setState(() {
-          _tempsController.text = "Heure invalide";
-        });
+      Duration difference = fin - debut;
+
+      // Handle cases where end time is on the next day (e.g., 23:00 to 01:00)
+      if (difference.isNegative) {
+        difference = difference + const Duration(days: 1);
       }
+
+      final heures = difference.inHours;
+      final minutes = difference.inMinutes.remainder(60);
+
+      String texte;
+      if (heures == 0 && minutes == 0) {
+        texte = "0 min"; // Or "0 h 0 min" if preferred
+      } else if (heures > 0 && minutes > 0) {
+        texte = "$heures h $minutes min";
+      } else if (heures > 0) {
+        texte = "$heures h";
+      } else { // minutes > 0
+        texte = "$minutes min";
+      }
+
+      setState(() {
+        _tempsController.text = texte;
+      });
+    } else {
+      setState(() {
+        _tempsController.text = "Heure invalide";
+      });
     }
   }
 
@@ -105,6 +122,26 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
       initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
+      helpText: 'Sélectionner une date',
+      cancelText: 'Annuler',
+      confirmText: 'Confirmer',
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF0D147F), // Header background color
+              onPrimary: Colors.white, // Header text color
+              onSurface: Colors.black, // Body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF0D147F), // Button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -117,7 +154,27 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
   Future<void> _selectTime(TextEditingController controller, bool isStart) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: selectedHeureDebut ?? TimeOfDay.now(), // Use existing time or now
+      helpText: 'Sélectionner une heure',
+      cancelText: 'Annuler',
+      confirmText: 'Confirmer',
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF0D147F), // Header background color
+              onPrimary: Colors.white, // Header text color
+              onSurface: Colors.black, // Body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF0D147F), // Button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
@@ -139,59 +196,90 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
   Future<void> _submitForm() async {
     if (!_validateForm()) return;
 
+    // Check if programmation details are loaded
+    if (_programmationDetails == null) {
+      _showError('Détails de la programmation non chargés. Veuillez réessayer.');
+      return;
+    }
+
+    // Get ecue_id from the nested ecue_relation object
+    final int? ecueId = _programmationDetails?['ecue_relation']?['id'];
+    if (ecueId == null) {
+      _showError('Impossible de récupérer l\'ID ECUE. Données de programmation incomplètes ou ECUE non défini.');
+      print('Debug: _programmationDetails: $_programmationDetails'); // Added for debugging
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Date et heure actuelles au format UTC
+      // Date et heure actuelles au format UTC pour created_at/updated_at
       final now = DateTime.now().toUtc();
-      final currentDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+      final currentDateTimeUtc = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
-      // Format pour la date sélectionnée
+      // Date sélectionnée au format YYYY-MM-DD
       final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate!);
 
-      // Format pour les heures
+      // Heures au format HH:mm:ss (comme l'API l'a demandé)
       final heureDebut = '${selectedHeureDebut!.hour.toString().padLeft(2, '0')}:${selectedHeureDebut!.minute.toString().padLeft(2, '0')}:00';
       final heureFin = '${selectedHeureFin!.hour.toString().padLeft(2, '0')}:${selectedHeureFin!.minute.toString().padLeft(2, '0')}:00';
 
-      // Calcul de la durée en minutes
+      // Calcul de la durée en minutes (assurez-vous que _calculerTemps a déjà mis à jour _tempsController.text)
       int dureeMinutes = 0;
-      if (_tempsController.text.contains('h')) {
-        final parts = _tempsController.text.split('h');
+      final tempsText = _tempsController.text;
+      if (tempsText.contains('h')) {
+        final parts = tempsText.split('h');
         dureeMinutes = int.parse(parts[0].trim()) * 60;
         if (parts.length > 1 && parts[1].contains('min')) {
           dureeMinutes += int.parse(parts[1].replaceAll('min', '').trim());
         }
+      } else if (tempsText.contains('min')) {
+        dureeMinutes = int.parse(tempsText.replaceAll('min', '').trim());
       }
 
+
       final response = await http.post(
-        Uri.parse('http://192.168.91.2:8000/api/gestioncontrat/cahier/create'),
+        Uri.parse('http://192.168.181.2:8000/api/gestioncontrat/cahier/create'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
           'programmation_id': int.parse(widget.programmationId),
-          'ecue_id': _programmationDetails?['ecue'] ?? 1,
+          'ecue_id': ecueId, // Now correctly using the direct 'ecue' ID
           'date': formattedDate,
           'heure_debut': heureDebut,
           'heure_fin': heureFin,
           'duree': dureeMinutes,
           'libelles': _libelleController.text,
-          'created_at': currentDateTime,
-          'updated_at': currentDateTime
+          'created_at': currentDateTimeUtc, // Send as UTC
+          'updated_at': currentDateTimeUtc  // Send as UTC
         }),
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        Navigator.pop(context, true);
+        _showSnackBar('Cahier créé avec succès', Colors.green); // Success message
+        Navigator.pop(context, true); // Return true to indicate success
       } else {
         final data = json.decode(response.body);
-        throw Exception(data['message'] ?? 'Erreur lors de la création du cahier');
+        // Log the full error response from the server
+        print('API Error Response: ${response.body}');
+        // Display specific error messages from the server if available
+        if (data['message'] is Map) {
+          String validationErrors = '';
+          data['message'].forEach((field, messages) {
+            validationErrors += '\n- ${field}: ${messages.join(', ')}';
+          });
+          _showError('Erreur de validation: $validationErrors');
+        } else {
+          _showError(data['message'] ?? 'Erreur lors de la création du cahier');
+        }
       }
     } catch (e) {
       _showError('Erreur: ${e.toString()}');
+      print('Exception during form submission: $e'); // Log the exception
     } finally {
       setState(() {
         _isLoading = false;
@@ -212,20 +300,25 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
       _showError('Veuillez saisir un libellé');
       return false;
     }
-    if (_tempsController.text == "Heure invalide") {
-      _showError('Les heures saisies sont invalides');
+    if (_tempsController.text == "Heure invalide" || _tempsController.text.isEmpty || _tempsController.text == "0 min") {
+      _showError('Veuillez saisir des heures valides pour calculer la durée.');
       return false;
     }
     return true;
   }
 
-  void _showError(String message) {
+  void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: color,
+        duration: const Duration(seconds: 3),
       ),
     );
+  }
+
+  void _showError(String message) {
+    _showSnackBar(message, Colors.red);
   }
 
   Widget _buildLabel(String label) {
@@ -237,8 +330,6 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
       ),
     );
   }
-
-
 
   Widget _buildTempsAuto() {
     return Container(
@@ -326,6 +417,83 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Show a loading indicator if programmation details are still being fetched
+    if (_isLoadingProgrammation) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF0D147F)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'Chargement...',
+            style: TextStyle(
+              fontSize: 20,
+              color: Color(0xFF0D147F),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xFF0D147F)),
+        ),
+      );
+    }
+
+    // Show error if programmation details failed to load
+    if (_programmationDetails == null) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF0D147F)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'Erreur de chargement',
+            style: TextStyle(
+              fontSize: 20,
+              color: Color(0xFF0D147F),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text(
+                'Impossible de charger les détails de la programmation.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.red),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _loadProgrammationDetails,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0D147F),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Réessayer'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Safely get UE name and ECUE name
+    final ueName = _programmationDetails?['ue']?['nom'] ?? 'Nom UE Inconnu';
+    final ecueName = _programmationDetails?['ecue_relation']?['nom'] ?? 'Nom ECUE Inconnu';
+
+    // Main content once data is loaded
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -351,18 +519,29 @@ class _FormulaireAddScreenState extends State<FormulaireAddScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Text(
-                  widget.matiere,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.indigo,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  children: [
+                    Text(
+                      ueName, // Display UE name
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.indigo,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4), // Small spacing between UE and ECUE
+                    Text(
+                      ecueName, // Display ECUE name
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[700],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),
-
-
 
               _buildLabel("Date"),
               _buildDateInput(),
